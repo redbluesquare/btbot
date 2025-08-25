@@ -27,6 +27,37 @@ class DebugSubListener:
         # Called when you or LS tear down the subscription
         print("🚫 Unsubscribed")
 
+class MultiEpicPriceListener:
+    def __init__(self, scale, store_to_db):
+        self.scale = scale
+        self.store_to_db = store_to_db
+
+    def onSubscription(self):
+        print(f"✅ Subscription active for multiple epics @ {self.scale}")
+
+    def onItemUpdate(self, update):
+        item_name = update.getItemName()  # e.g. "CHART:CS.D.EURUSD.MINI.IP:1MINUTE"
+        try:
+            _, epic, _ = item_name.split(":")  # extract epic from item name
+        except ValueError:
+            print(f"⚠️ Unexpected item format: {item_name}")
+            return
+        if update.getValue("CONS_END") == "1":
+            ts = pd.to_datetime(int(update.getValue("UTM")), unit="ms")
+            ohlc = {
+                "epic":  epic,
+                "date":  ts.strftime("%Y-%m-%d %H:%M:%S"),
+                "scale": self.scale,
+                "open":  float(update.getValue("BID_OPEN")),
+                "high":  float(update.getValue("BID_HIGH")),
+                "low":   float(update.getValue("BID_LOW")),
+                "close": float(update.getValue("BID_CLOSE"))
+            }
+            self.store_to_db(ohlc)
+    def onItemLostUpdates(self, item, lost, key):
+        print(f"⚠️ Lost {lost} updates for {item}")
+
+
 class PriceListener:
     def __init__(self, epic, scale, store_to_db):
         self.epic = epic
@@ -64,15 +95,11 @@ def store_to_db( ohlc):
             CREATE TABLE IF NOT EXISTS ohlc_data (
                 epic TEXT,
                 date TEXT,
-<<<<<<< HEAD
                 scale TEXT,
-=======
->>>>>>> 06aaed0 (updates with test2.py working to get data)
                 open REAL,
                 high REAL,
                 low REAL,
                 close REAL,
-<<<<<<< HEAD
                 PRIMARY KEY (epic, date, scale)
             )
         ''')
@@ -80,15 +107,6 @@ def store_to_db( ohlc):
             INSERT OR REPLACE INTO ohlc_data (epic, date, scale, open, high, low, close)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (ohlc['epic'], ohlc['date'], ohlc['scale'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
-=======
-                PRIMARY KEY (epic, date)
-            )
-        ''')
-        c.execute('''
-            INSERT OR REPLACE INTO ohlc_data (epic, date, open, high, low, close)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (ohlc['epic'], ohlc['date'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
->>>>>>> 06aaed0 (updates with test2.py working to get data)
         db.commit()
         db.close()
 
@@ -101,13 +119,15 @@ stream_svc.create_session()
 stream_svc.ls_client.connect()
 
 # 3) Build raw Subscription
-epic   = "IX.D.FTSE.DAILY.IP"
 scale  = "1MINUTE"
-item   = f"CHART:{epic}:{scale}"
+epics = ['IX.D.FTSE.DAILY.IP', 'CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
+items = [f"CHART:{epic}:{scale}" for epic in epics]
+#epic   = "IX.D.FTSE.DAILY.IP"
+#item   = f"CHART:{epic}:{scale}"
 fields = ["BID_OPEN","BID_HIGH","BID_LOW","BID_CLOSE","CONS_END","UTM"]
-sub  = Subscription("MERGE",[item], fields)
+sub  = Subscription("MERGE",items, fields)
 sub.addListener(DebugSubListener())       # wrapper listener
-sub.addListener(PriceListener(epic, scale, store_to_db))
+sub.addListener(MultiEpicPriceListener(scale, store_to_db))
 
 # 3) Subscribe on the wrapper’s client
 stream_svc.ls_client.subscribe(sub)
