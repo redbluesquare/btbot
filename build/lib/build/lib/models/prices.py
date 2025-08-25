@@ -2,8 +2,6 @@ import json
 import requests
 import models.user as user
 import os
-import sqlite3
-import pandas as pd
 
 class Prices():
 
@@ -12,41 +10,6 @@ class Prices():
         
         pass
         
-    def on_price_update(self, item_update, epic):
-        print(f"📡 Update received for {epic}: {item_update}")
-        if item_update['CONS_END'] == '1':
-            timestamp = pd.to_datetime(int(item_update['UTM']), unit='ms')
-            ohlc = {
-                'epic': epic,
-                'date': timestamp,
-                'open': float(item_update['BID_OPEN']),
-                'high': float(item_update['BID_HIGH']),
-                'low': float(item_update['BID_LOW']),
-                'close': float(item_update['BID_CLOSE'])
-            }
-            self.store_to_db(ohlc)
-    
-    def store_to_db(self, ohlc):
-        db = sqlite3.connect('streamed_prices.db')
-        c = db.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS ohlc_data (
-                epic TEXT,
-                date TEXT,
-                open REAL,
-                high REAL,
-                low REAL,
-                close REAL,
-                PRIMARY KEY (epic, date)
-            )
-        ''')
-        c.execute('''
-            INSERT OR REPLACE INTO ohlc_data (epic, date, open, high, low, close)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (ohlc['epic'], ohlc['date'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
-        db.commit()
-        db.close()
-
     def add_prices(self, pd, epic, resolution, filename):
         loggedIn = False
         base_url = os.getenv('BASE_URL')

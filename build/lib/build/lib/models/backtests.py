@@ -1,39 +1,9 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import models.indicators as indicators
 
 class Backtests():
 
     def __init__(self):
-        self.ind = indicators.Indicators()
         pass
     
-    def backtest(self):
-        filename = 'media\/output\/gold_hour_2'
-        # 📂 Load the CSV file
-        df = pd.read_csv(filename+'.csv', parse_dates=['date'])
-        #cci = self.ind.calculate_cci(df)
-        df = self.ind.calculate_macd(df)
-        df = self.ind.calculate_rsi(df)
-        df = self.ind.calculate_ratcheting_trailing_stop(df, 1, 6)
-        df = self.ind.generate_signals(df, 2)
-
-        #df, trades = self.backtest_macd_rsi_buy_sell(df, shares=10)
-        df, trades = self.backtest_spreadbet(df, stake_per_point=1)
-
-        # View trades
-        for t in trades:
-            print(t)
-
-        plt.figure(figsize=(12,6))
-        plt.plot(df['date'], df['running_pnl'], label='Cumulative PnL', color='green')
-        plt.title('Backtest: Cumulative Profit/Loss')
-        plt.xlabel('Date')
-        plt.ylabel('PnL (£)')
-        plt.legend()
-        plt.grid(True)
-        plt.show()
-
     def backtest_macd_rsi_buy_sell(self, df, shares=10):
         trades = []
         position_open = False

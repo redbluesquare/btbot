@@ -1,4 +1,7 @@
 from trading_ig import IGService
+from trading_ig.stream import IGStreamService
+from trading_ig.stream import Subscription
+import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
@@ -24,61 +27,60 @@ user_pw = os.getenv('PASSWORD')
 acc_type = os.getenv('ACC_TYPE')
 
 ig_service = usr.login_ig(IGService, username, user_pw, API_KEY, acc_type=acc_type)
+# Start Lightstreamer stream
+ig_stream_service = IGStreamService(ig_service)
+ig_stream_service.create_session()
 
-# epic = 'CS.D.GBPEUR.TODAY.IP'
-epic = 'CS.D.USCGC.TODAY.IP'
-# epic = 'IX.D.DOW.DAILY.IP'
+#epic = ['CS.D.GBPEUR.TODAY.IP','CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
 
-#resolution = 'DAY'
-#resolution = 'HOUR_2'
-resolution = 'MINUTE_5'
+epic = 'IX.D.FTSE.DAILY.IP'  # Replace with your instrument
+scale = '1MINUTE'
+item = f"CHART:{epic}:{scale}"
 
-#filename = 'w_s_daily_prices'
-#filename = 'gold_daily'
-filename = 'gold_hour_2'
-#filename = 'gold_minute_5'
+fields = [
+    'BID_OPEN',
+    'BID_HIGH',
+    'BID_LOW',
+    'BID_CLOSE',
+    'CONS_END',     # Marks candle completion
+    'UTM'           # Timestamp in milliseconds
+]
 
-#while True:
-# 📂 Load the CSV file
-df = pd.read_csv(filename+'.csv', parse_dates=['date'])
-#cci = ind.calculate_cci(df)
-df = ind.calculate_macd(df)
-df = ind.calculate_rsi(df)
-df = ind.calculate_ratcheting_trailing_stop(df, 1, 6)
+# Create the subscription object
+subscription = Subscription(
+    mode="MERGE",
+    items=[item],
+    fields=fields
+)
 
-df = ind.generate_signals(df, 2)
+def safe_listener(update):
+    try:
+        price.on_price_update(update, epic)
+    except Exception as e:
+        print(f"❌ Listener error: {e}")
 
-#df, trades = btest.backtest_macd_rsi_buy_sell(df, shares=10)
-df, trades = btest.backtest_spreadbet(df, stake_per_point=1)
+# Attach the listener function (don't call it!)
+subscription.addListener(safe_listener)
 
-# View trades
-for t in trades:
-    print(t)
+# Subscribe using the Lightstreamer client
+ig_stream_service.ls_client.subscribe(subscription)
 
-# Plot running PnL
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(12,6))
-plt.plot(df['date'], df['running_pnl'], label='Cumulative PnL', color='green')
-plt.title('Backtest: Cumulative Profit/Loss')
-plt.xlabel('Date')
-plt.ylabel('PnL (£)')
-plt.legend()
-plt.grid(True)
-plt.show()
 
 def run_strategy():
-    print(f"Running strategy at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    # Your logic here: fetch price, update CSV, run backtest, etc.
+    now = datetime.now()
+    hour = now.hour
+    weekday = now.weekday()  # Monday = 0, Sunday = 6
 
-# Schedule the task
-schedule.every().monday.at("08:00").do(run_strategy)
-schedule.every().tuesday.at("08:00").do(run_strategy)
-schedule.every().wednesday.at("08:00").do(run_strategy)
-schedule.every().thursday.at("08:00").do(run_strategy)
-schedule.every().friday.at("08:00").do(run_strategy)
+    if 0 <= weekday <= 4 and 4 <= hour < 23:
+        print(f"✅ Running strategy at {now.strftime('%Y-%m-%d %H:%M:%S')}")
+        # Your strategy logic here: fetch price, update CSV, run backtest, etc.
+    else:
+        print(f"⏸️ Skipped at {now.strftime('%Y-%m-%d %H:%M:%S')} (outside trading hours)")
+
+# Schedule to run every minute
+#schedule.every(1).minutes.do(run_strategy)
 
 # Keep the scheduler running
-while True:
-    schedule.run_pending()
-    time.sleep(20)
+#while True:
+#    schedule.run_pending()
+#    time.sleep(1)
