@@ -1,0 +1,28 @@
+Metadata-Version: 2.4
+Name: trading-strategy-backtester
+Version: 0.1.0
+Summary: Backtesting framework for MACD/RSI strategies with IG API integration
+Author: Darryl
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0
+Requires-Dist: numpy>=1.24
+Requires-Dist: matplotlib>=3.7
+Requires-Dist: trading-ig>=0.0.6
+Requires-Dist: schedule>=1.2.0
+
+# btBot
+
+## Setup
+
+Create an .env file with the following variables
+
+```
+ENV_TYPE=test/prod
+
+IDENTIFIER=<<username>>
+PASSWORD=<<user-password>>
+ENCRYPTED_PASSWORD=null
+API_KEY=<<enter_the_api_key>>
+BASE_URL=https://demo-api.ig.com/gateway/deal/
+```

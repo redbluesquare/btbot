@@ -1,0 +1,21 @@
+[project]
+name = "trading-strategy-backtester"
+version = "0.1.0"
+description = "Backtesting framework for MACD/RSI strategies with IG API integration"
+authors = [
+    { name = "Darryl" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "trading-ig>=0.0.6",
+    "schedule>=1.2.0"
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
