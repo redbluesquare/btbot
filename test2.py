@@ -64,29 +64,10 @@ def store_to_db( ohlc):
             CREATE TABLE IF NOT EXISTS ohlc_data (
                 epic TEXT,
                 date TEXT,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                scale TEXT,
-=======
->>>>>>> 06aaed0 (updates with test2.py working to get data)
-=======
->>>>>>> 06aaed0 (updates with test2.py working to get data)
                 open REAL,
                 high REAL,
                 low REAL,
                 close REAL,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                PRIMARY KEY (epic, date, scale)
-            )
-        ''')
-        c.execute('''
-            INSERT OR REPLACE INTO ohlc_data (epic, date, scale, open, high, low, close)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (ohlc['epic'], ohlc['date'], ohlc['scale'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
-=======
-=======
->>>>>>> 06aaed0 (updates with test2.py working to get data)
                 PRIMARY KEY (epic, date)
             )
         ''')
@@ -94,10 +75,6 @@ def store_to_db( ohlc):
             INSERT OR REPLACE INTO ohlc_data (epic, date, open, high, low, close)
             VALUES (?, ?, ?, ?, ?)
         ''', (ohlc['epic'], ohlc['date'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
-<<<<<<< HEAD
->>>>>>> 06aaed0 (updates with test2.py working to get data)
-=======
->>>>>>> 06aaed0 (updates with test2.py working to get data)
         db.commit()
         db.close()
 
