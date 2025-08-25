@@ -64,17 +64,18 @@ def store_to_db( ohlc):
             CREATE TABLE IF NOT EXISTS ohlc_data (
                 epic TEXT,
                 date TEXT,
+                scale TEXT,
                 open REAL,
                 high REAL,
                 low REAL,
                 close REAL,
-                PRIMARY KEY (epic, date)
+                PRIMARY KEY (epic, date, scale)
             )
         ''')
         c.execute('''
-            INSERT OR REPLACE INTO ohlc_data (epic, date, open, high, low, close)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (ohlc['epic'], ohlc['date'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
+            INSERT OR REPLACE INTO ohlc_data (epic, date, scale, open, high, low, close)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (ohlc['epic'], ohlc['date'], ohlc['scale'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
         db.commit()
         db.close()
 
