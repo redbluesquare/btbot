@@ -2,3 +2,4 @@
 .env
 media/output/*
 *.db
+*/__pycache__
