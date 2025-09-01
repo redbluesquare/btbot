@@ -119,7 +119,7 @@ stream_svc.create_session()
 stream_svc.ls_client.connect()
 
 # 3) Build raw Subscription
-scale  = "1MINUTE"
+scale  = "5MINUTE"
 epics = ['IX.D.FTSE.DAILY.IP', 'CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
 items = [f"CHART:{epic}:{scale}" for epic in epics]
 #epic   = "IX.D.FTSE.DAILY.IP"
