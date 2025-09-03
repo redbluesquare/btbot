@@ -13,3 +13,9 @@ ENCRYPTED_PASSWORD=null
 API_KEY=<<enter_the_api_key>>
 BASE_URL=https://demo-api.ig.com/gateway/deal/
 ```
+
+``` bash
+sudo systemctl status ohlc-stream.service
+
+journalctl -u ohlc-stream.service -f
+```
