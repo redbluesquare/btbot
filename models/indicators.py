@@ -110,7 +110,7 @@ class Indicators():
         df['sell_signal_trailing'] = df['close'] < df['trailing_stop']
         return df
     
-    def is_within_trading_hours(self, timestamp, start_hour=10, end_hour=19):
+    def is_within_trading_hours(self, timestamp, start_hour=9, end_hour=19):
         return start_hour <= timestamp.hour < end_hour
 
     def calculate_trailing_stop(self, df, window=10, buffer=4):

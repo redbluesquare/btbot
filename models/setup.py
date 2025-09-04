@@ -6,7 +6,7 @@ def create_trades_table():
     c.execute('''
         CREATE TABLE IF NOT EXISTS trade_data (
             epic TEXT,
-            date TEXT,
+            trade_date TEXT,
             trade_type TEXT,
             price REAL,
             macd REAL,
@@ -26,6 +26,7 @@ def create_trading_check_table():
         CREATE TABLE IF NOT EXISTS trading_position (
             epic TEXT,
             position REAL,
+            check_date TEXT,
             PRIMARY KEY (epic)
         )
     ''')

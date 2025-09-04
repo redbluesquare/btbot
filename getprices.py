@@ -48,10 +48,14 @@ class MultiEpicPriceListener:
                 "epic":  epic,
                 "date":  ts.strftime("%Y-%m-%d %H:%M:%S"),
                 "scale": self.scale,
-                "open":  float(update.getValue("BID_OPEN")),
-                "high":  float(update.getValue("BID_HIGH")),
-                "low":   float(update.getValue("BID_LOW")),
-                "close": float(update.getValue("BID_CLOSE"))
+                "bid_open":  float(update.getValue("BID_OPEN")),
+                "bid_high":  float(update.getValue("BID_HIGH")),
+                "bid_low":   float(update.getValue("BID_LOW")),
+                "bid_close": float(update.getValue("BID_CLOSE")),
+                "offer_open":  float(update.getValue("OFR_OPEN")),
+                "offer_high":  float(update.getValue("OFR_HIGH")),
+                "offer_low":   float(update.getValue("OFR_LOW")),
+                "offer_close": float(update.getValue("OFR_CLOSE"))
             }
             self.store_to_db(ohlc)
     def onItemLostUpdates(self, item, lost, key):
@@ -77,10 +81,14 @@ class PriceListener:
                 "epic":  self.epic,
                 "date":  ts.strftime("%Y-%m-%d %H:%M:%S"),
                 "scale": self.scale,
-                "open":  float(update.getValue("BID_OPEN")),
-                "high":  float(update.getValue("BID_HIGH")),
-                "low":   float(update.getValue("BID_LOW")),
-                "close": float(update.getValue("BID_CLOSE"))
+                "bid_open":  float(update.getValue("BID_OPEN")),
+                "bid_high":  float(update.getValue("BID_HIGH")),
+                "bid_low":   float(update.getValue("BID_LOW")),
+                "bid_close": float(update.getValue("BID_CLOSE")),
+                "offer_open":  float(update.getValue("OFR_OPEN")),
+                "offer_high":  float(update.getValue("OFR_HIGH")),
+                "offer_low":   float(update.getValue("OFR_LOW")),
+                "offer_close": float(update.getValue("OFR_CLOSE"))
             }
             self.store_to_db(ohlc)
 
@@ -91,23 +99,30 @@ class PriceListener:
 def store_to_db( ohlc):
         db = sqlite3.connect('streamed_prices.db')
         c = db.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS ohlc_data (
-                epic TEXT,
-                date TEXT,
-                scale TEXT,
-                open REAL,
-                high REAL,
-                low REAL,
-                close REAL,
-                PRIMARY KEY (epic, date, scale)
-            )
-        ''')
-        c.execute('''
-            INSERT OR REPLACE INTO ohlc_data (epic, date, scale, open, high, low, close)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (ohlc['epic'], ohlc['date'], ohlc['scale'], ohlc['open'], ohlc['high'], ohlc['low'], ohlc['close']))
-        db.commit()
+        try:
+            c.execute('''
+                CREATE TABLE IF NOT EXISTS ohlc_data (
+                    epic TEXT,
+                    date TEXT,
+                    scale TEXT,
+                    bid_open REAL,
+                    bid_high REAL,
+                    bid_low REAL,
+                    bid_close REAL,
+                    offer_open REAL,
+                    offer_high REAL,
+                    offer_low REAL,
+                    offer_close REAL,
+                    PRIMARY KEY (epic, date, scale)
+                )
+            ''')
+            c.execute('''
+                INSERT OR REPLACE INTO ohlc_data (epic, date, scale, bid_open, bid_high, bid_low, bid_close, offer_open, offer_high, offer_low, offer_close)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (ohlc['epic'], ohlc['date'], ohlc['scale'], ohlc['bid_open'], ohlc['bid_high'], ohlc['bid_low'], ohlc['bid_close'], ohlc['offer_open'], ohlc['offer_high'], ohlc['offer_low'], ohlc['offer_close']))
+            db.commit()
+        except Exception as e:
+            print(str(e))
         db.close()
 
 # 1) Login + fetch tokens
@@ -124,7 +139,7 @@ epics = ['IX.D.FTSE.DAILY.IP', 'CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
 items = [f"CHART:{epic}:{scale}" for epic in epics]
 #epic   = "IX.D.FTSE.DAILY.IP"
 #item   = f"CHART:{epic}:{scale}"
-fields = ["BID_OPEN","BID_HIGH","BID_LOW","BID_CLOSE","CONS_END","UTM"]
+fields = ["BID_OPEN","BID_HIGH","BID_LOW","BID_CLOSE","OFR_OPEN","OFR_HIGH","OFR_LOW","OFR_CLOSE","CONS_END","UTM"]
 sub  = Subscription("MERGE",items, fields)
 sub.addListener(DebugSubListener())       # wrapper listener
 sub.addListener(MultiEpicPriceListener(scale, store_to_db))

@@ -19,7 +19,10 @@ class Prices():
         """
         conn = sqlite3.connect(db_path)
         query = """
-            SELECT epic, date, open, high, low, close
+            SELECT epic, date, (bid_open+offer_open)/2 open
+            ,(bid_high+offer_high)/2 high
+            ,(bid_low+offer_low)/2 low
+            ,(bid_close+offer_close)/2 close
             FROM ohlc_data
             WHERE epic = ? AND scale = ?
             ORDER BY date ASC

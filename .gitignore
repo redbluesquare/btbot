@@ -1,9 +1,5 @@
 .venv
 .env
 media/output/*
-<<<<<<< HEAD
-*.db
-=======
 *.db
 */__pycache__
->>>>>>> main
