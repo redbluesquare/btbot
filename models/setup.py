@@ -8,6 +8,8 @@ def create_trades_table():
             epic TEXT,
             trade_date TEXT,
             trade_type TEXT,
+            dealStatus TEXT,
+            dealId TEXT,
             price REAL,
             macd REAL,
             rsi REAL,
