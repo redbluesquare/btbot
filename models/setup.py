@@ -15,8 +15,8 @@ def create_trades_table():
             rsi REAL,
             stake REAL,
             pnl REAL,
-            PRIMARY KEY (epic, date, trade_type)
-        )
+            stopLevel REAL,
+            PRIMARY KEY (epic, trade_date, trade_type))
     ''')
     db.commit()
     db.close()
