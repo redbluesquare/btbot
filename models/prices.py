@@ -2,6 +2,8 @@ import json
 import requests
 import models.user as user
 import os
+import sqlite3
+import pandas as pd
 
 class Prices():
 
@@ -9,33 +11,32 @@ class Prices():
         self.user = user.User()
         
         pass
-        
-    def add_prices(self, pd, epic, resolution, filename):
-        loggedIn = False
-        base_url = os.getenv('BASE_URL')
-        API_KEY = os.getenv('API_KEY')
-        username = os.getenv('IDENTIFIER')
-        user_pw = os.getenv('PASSWORD')
-        encrypted = os.getenv('ENCRYPTED_PASSWORD')
-        print("logged in:", loggedIn)
-        loggedIn, CST, X_SEC_TOKEN, ACCOUNT_ID, API_KEY = self.user.login(base_url, API_KEY, username, user_pw, encrypted) 
-        print("logged in:", loggedIn)
-        #ws_data = price.get_x_prices(base_url, API_KEY, CST, X_SEC_TOKEN, epic, resolution,100)['prices']
-        ws_data = self.get_prices(base_url, API_KEY, CST, X_SEC_TOKEN, epic, resolution, '2025-07-15','2025-08-31')['prices']
-        #ws_data = price.get_prices(base_url, API_KEY, CST, X_SEC_TOKEN, epic, resolution, '2024-01-01','2025-08-31')['prices']
-        print(len(ws_data))
-        df = pd.DataFrame(ws_data)
-        print(df.head)
-        # 🧹 Clean and format
-        df['date'] = pd.to_datetime(df['snapshotTime'])
-        df['open'] = df['openPrice'].apply(lambda x: x['bid'])
-        df['close'] = df['closePrice'].apply(lambda x: x['bid'])  # Use bid or mid depending on preference 
-        df['high'] = df['highPrice'].apply(lambda x: x['bid'])  # Use bid or mid depending on preference 
-        df['low'] = df['lowPrice'].apply(lambda x: x['bid'])  # Use bid or mid depending on preference 
-        df = df[['date', 'open', 'high', 'low', 'close']]
-        # 💾 Save to CSV
-        df.to_csv(filename+'.csv', index=False)
-        print("✅ Price data saved to "+filename+".csv")
+    
+    def load_ohlc(self, epic, scale='1MINUTE', db_path="streamed_prices.db"):
+        """
+        Load OHLC data for a given epic and timeframe from SQLite.
+        Returns a pandas DataFrame indexed by datetime.
+        """
+        conn = sqlite3.connect(db_path)
+        query = """
+            SELECT epic, date, (bid_open+offer_open)/2 open
+            ,(bid_high+offer_high)/2 high
+            ,(bid_low+offer_low)/2 low
+            ,(bid_close+offer_close)/2 close
+            FROM ohlc_data
+            WHERE epic = ? AND scale = ?
+            ORDER BY date ASC
+        """
+        df = pd.read_sql_query(query, conn, params=(epic, scale))
+        conn.close()
+        df["open"]  = pd.to_numeric(df["open"], errors="coerce")
+        df["high"]  = pd.to_numeric(df["high"], errors="coerce")
+        df["low"]   = pd.to_numeric(df["low"], errors="coerce")
+        df["close"] = pd.to_numeric(df["close"], errors="coerce")
+        # Convert date to datetime and set index
+        df["date"] = pd.to_datetime(df["date"])
+        #df.set_index("date", inplace=True)
+        return df
     
     def get_prices(self, base_url, api_key, cst, x_sec_token, epic, resolution, start_time, end_time):
         #Get market data

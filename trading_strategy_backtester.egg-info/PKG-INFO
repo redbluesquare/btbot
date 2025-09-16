@@ -10,6 +10,7 @@ Requires-Dist: numpy>=1.24
 Requires-Dist: matplotlib>=3.7
 Requires-Dist: trading-ig>=0.0.6
 Requires-Dist: schedule>=1.2.0
+Requires-Dist: lightstreamer-client-lib>=1.0.3
 
 # btBot
 

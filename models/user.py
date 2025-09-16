@@ -23,6 +23,6 @@ class User():
         ACCOUNT_ID = body['currentAccountId']
         return [loggedIn, CST, X_SEC_TOKEN, ACCOUNT_ID, api_key]
     
-    def login_ig(self, IGService, username, user_pw, API_KEY, acc_type='demo'):
+    def login_ig(self, IGService, username, user_pw, API_KEY, acc_type='DEMO'):
         return IGService(username=username,password=user_pw,
                             api_key=API_KEY,acc_type=acc_type)

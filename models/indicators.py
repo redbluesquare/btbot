@@ -89,7 +89,7 @@ class Indicators():
         plt.legend()
         plt.show()
     
-    def calculate_ratcheting_trailing_stop(self, df, window=10, buffer=4):
+    def calculate_ratcheting_trailing_stop(self, df, window=0, buffer=10):
         # Calculate raw trailing stop based on lowest of last 10 OCHL bars
         df['min_price_10'] = df[['open', 'high', 'low', 'close']].rolling(window=window).min().min(axis=1)
         df['raw_trailing_stop'] = df['min_price_10'] - buffer
@@ -110,7 +110,7 @@ class Indicators():
         df['sell_signal_trailing'] = df['close'] < df['trailing_stop']
         return df
     
-    def is_within_trading_hours(self, timestamp, start_hour=10, end_hour=20):
+    def is_within_trading_hours(self, timestamp, start_hour=9, end_hour=19):
         return start_hour <= timestamp.hour < end_hour
 
     def calculate_trailing_stop(self, df, window=10, buffer=4):
@@ -120,12 +120,11 @@ class Indicators():
         return df
 
     def generate_signals(self, df, strategy = 1):
-        df = self.calculate_macd(df)
-        df = self.calculate_rsi(df)
+        #df = self.calculate_macd(df)
+        #df = self.calculate_rsi(df)
         df['buy_signal'] = False
         df['sell_signal'] = False
         holding = False  # Tracks whether a position is open
-
         i = 0
         while i < len(df) - 3:
             if not holding:
