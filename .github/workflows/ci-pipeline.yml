@@ -1,0 +1,38 @@
+name: btbot ci pipeline
+
+on: push
+
+jobs:
+  tests:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        python-version: [3.11]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Install the virtual environment
+      run: python -m venv .venv
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install e .
+    - name: Run tests
+      run: |
+        pytest tests/
+  
+  build:
+    name: Build the app
+    if: ${{ github.ref == 'refs/main' }}
+    needs: [ tests ]
+    runs-on: [ self-hosted ]
+    strategy:
+      matrix:
+        python-version: [3.11]
+    steps:
+      - name: Checkout the repository
+        run: actions/checkout@v4
+      - name: package the files
+        run: |
+          zip -r btbot.zip .
+          cp btbot.zip /opt/btbot.zip
