@@ -21,7 +21,7 @@ jobs:
         .venv/bin/pip install e .
     - name: Run tests
       run: |
-        pytest tests/
+        .venv/bin/pytest tests/
   
   build:
     name: Build the app
