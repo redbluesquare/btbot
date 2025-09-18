@@ -37,8 +37,8 @@ jobs:
         run: |
           cp -u -r -a ~/actions-runner/_work/btbot/btbot/. ~/btbot
           cd ~/btbot
-          python -m venv .venv
-          .venv/bin/pip install e .
+          python -m venv ~/btbot/.venv
+          ~/btbot/.venv/bin/pip install e .
           sudo cp ~/btbot/files/ohlc-stream.service.j2 /etc/systemd/system/ohlc-stream.service
           sudo cp ~/btbot/files/dow-trade.service.j2 /etc/systemd/system/dow-trade.service
           sudo cp ~/btbot/files/gold-trade.service.j2 /etc/systemd/system/gold-trade.service
