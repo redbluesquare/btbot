@@ -25,7 +25,6 @@ jobs:
   
   build:
     name: Build the app
-    if: ${{ github.ref == 'refs/head/main' }}
     needs: [ tests ]
     runs-on: [ self-hosted ]
     strategy:
