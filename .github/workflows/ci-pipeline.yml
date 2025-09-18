@@ -32,7 +32,7 @@ jobs:
         python-version: [3.11]
     steps:
       - name: Checkout the repository
-        run: actions/checkout@v4
+        uses: actions/checkout@v4
       - name: package the files
         run: |
           cp -u -r -a ~/actions-runner/_work/btbot/btbot/. ~/btbot
