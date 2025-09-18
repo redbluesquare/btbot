@@ -43,4 +43,14 @@ jobs:
           sudo cp ~/btbot/files/ohlc-stream.service.j2 /etc/systemd/system/ohlc-stream.service
           sudo cp ~/btbot/files/dow-trade.service.j2 /etc/systemd/system/dow-trade.service
           sudo cp ~/btbot/files/gold-trade.service.j2 /etc/systemd/system/gold-trade.service
+      - name: restart the services
+        run: |
+          sudo systemctl daemon-reexec
+          sudo systemctl daemon-reload
+          sudo systemctl enable ohlc-stream.service
+          sudo systemctl restart ohlc-stream.service
+          sudo systemctl enable dow-trade.service
+          sudo systemctl restart dow-trade.service
+          sudo systemctl enable gold-trade.service
+          sudo systemctl restart gold-trade.service
 
