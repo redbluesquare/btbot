@@ -73,6 +73,7 @@ def traderbt():
             for i, row in window.iterrows():
                 print(row['epic'],row['date'],row['macd'],row['signal'],row['rsi'],row['bullish_crossover'],row['rsi_cross_above_50'])
             print('Buy condition:', buy_condition)
+        time.sleep(30)
     else:
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
@@ -99,7 +100,7 @@ def traderbt():
             db.close()
         else:
            print(row)
-    time.sleep(20)
+        time.sleep(60)
 while True:
     traderbt()
 
