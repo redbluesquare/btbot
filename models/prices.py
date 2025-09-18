@@ -12,7 +12,7 @@ class Prices():
         
         pass
     
-    def load_ohlc(self, epic, scale='1MINUTE', db_path="streamed_prices.db"):
+    def load_ohlc(self, epic, scale='1MINUTE', db_path="streamed_prices.db", records=100):
         """
         Load OHLC data for a given epic and timeframe from SQLite.
         Returns a pandas DataFrame indexed by datetime.
@@ -25,9 +25,9 @@ class Prices():
             ,(bid_close+offer_close)/2 close
             FROM ohlc_data
             WHERE epic = ? AND scale = ?
-            ORDER BY date ASC
+            ORDER BY date DESC LIMIT ?
         """
-        df = pd.read_sql_query(query, conn, params=(epic, scale))
+        df = pd.read_sql_query(query, conn, params=(epic, scale, records))
         conn.close()
         df["open"]  = pd.to_numeric(df["open"], errors="coerce")
         df["high"]  = pd.to_numeric(df["high"], errors="coerce")

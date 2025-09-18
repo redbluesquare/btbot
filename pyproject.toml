@@ -14,11 +14,8 @@ dependencies = [
     "matplotlib>=3.7",
     "trading-ig>=0.0.6",
     "schedule>=1.2.0",
-<<<<<<< HEAD
-    "lightstreamer-client-lib>=1.0.3"
-=======
-    "python-dotenv>=1.1.1"
->>>>>>> main
+    "lightstreamer-client-lib>=1.0.3",
+    "pytest>=8.4.2"
 ]
 
 [build-system]
@@ -26,8 +23,4 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-<<<<<<< HEAD
 exclude = ["media", "models"]
-=======
-exclude = ["media", "models"]
->>>>>>> main
