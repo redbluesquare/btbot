@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=~/btbot
-ExecStart=~/btbot/.venv/bin/python dowtrader.py
+WorkingDirectory=/opt/btbot
+ExecStart=/opt/btbot/.venv/bin/python dowtrader.py
 Restart=always
 RestartSec=10
 Environment="PYTHONUNBUFFERED=1"
