@@ -34,9 +34,16 @@
         creates: "{{ target_dir }}/.venv/bin/activate"
 
     - name: Upgrade pip in the virtualenv
-      command: "{{ target_dir }}/.venv/bin/pip install --upgrade pip"
-      args:
-        warn: false
+      ansible.builtin.pip:
+        virtualenv: "{{ target_dir }}/.venv"
+        name: pip
+        state: latest
+
+    - name: Install project in editable mode
+      ansible.builtin.pip:
+        virtualenv: "{{ target_dir }}/.venv"
+        editable: "{{ target_dir }}"
+
 
     - name: Install project in editable mode
       command: "{{ target_dir }}/.venv/bin/pip install -e ."
