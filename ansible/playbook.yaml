@@ -51,7 +51,7 @@
         owner: root
         group: root
         mode: '0644'
-      loop: "{{ lookup('fileglob', 'files/*.service.j2', wantlist=True) }}"
+      loop: "{{ lookup('fileglob', '/opt/btbot/files/*.service.j2', wantlist=True) }}"
 
     - name: Reload systemd daemon
       systemd:
