@@ -33,23 +33,17 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
-      - name: package the files
+      - name: Run Ansible playbook
         run: |
-          cp -u -r -a ~/actions-runner/_work/btbot/btbot/. ~/btbot
-          cd ~/btbot
-          python -m venv ~/btbot/.venv
-          ~/btbot/.venv/bin/pip install e .
-          sudo cp /opt/btbot/files/ohlc-stream.service.j2 /etc/systemd/system/ohlc-stream.service
-          sudo cp /opt/btbot/files/dow-trade.service.j2 /etc/systemd/system/dow-trade.service
-          sudo cp /opt/btbot/files/gold-trade.service.j2 /etc/systemd/system/gold-trade.service
-      - name: restart the services
-        run: |
-          sudo systemctl daemon-reexec
-          sudo systemctl daemon-reload
-          sudo systemctl enable ohlc-stream.service
-          sudo systemctl restart ohlc-stream.service
-          sudo systemctl enable dow-trade.service
-          sudo systemctl restart dow-trade.service
-          sudo systemctl enable gold-trade.service
-          sudo systemctl restart gold-trade.service
+          ansible-playbook ansible/playbook.yaml --connection=local --inventory 127.0.0.1,
+#      - name: restart the services
+#        run: |
+#          sudo systemctl daemon-reexec
+#          sudo systemctl daemon-reload
+#          sudo systemctl enable ohlc-stream.service
+#          sudo systemctl restart ohlc-stream.service
+#          sudo systemctl enable dow-trade.service
+#          sudo systemctl restart dow-trade.service
+#          sudo systemctl enable gold-trade.service
+#          sudo systemctl restart gold-trade.service
 
