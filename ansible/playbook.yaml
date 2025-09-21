@@ -40,12 +40,6 @@
         state: latest
 
     - name: Install project in editable mode
-      ansible.builtin.pip:
-        virtualenv: "{{ target_dir }}/.venv"
-        editable: yes
-
-
-    - name: Install project in editable mode
       command: "{{ target_dir }}/.venv/bin/pip install -e ."
       args:
         chdir: "{{ target_dir }}"
