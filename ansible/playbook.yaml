@@ -42,7 +42,7 @@
     - name: Install project in editable mode
       ansible.builtin.pip:
         virtualenv: "{{ target_dir }}/.venv"
-        editable: "{{ target_dir }}"
+        editable: yes
 
 
     - name: Install project in editable mode
