@@ -16,6 +16,7 @@ dependencies = [
     "schedule>=1.2.0",
     "lightstreamer-client-lib>=1.0.3",
     "pytest>=8.4.2"
+    "python-dotenv=1.1.1"
 ]
 
 [build-system]
