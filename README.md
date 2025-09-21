@@ -15,7 +15,7 @@ BASE_URL=https://demo-api.ig.com/gateway/deal/
 ```
 
 ```bash
-journalctl -u ohlc-stream.service -f
+sudo journalctl -u ohlc-stream.service -f
 ```
 
 ```bash

@@ -69,6 +69,7 @@ def traderbt():
                             ,trade['level'], trade['size'], window.iloc[-1]['macd'], window.iloc[-1]['rsi'], 0))
             db.commit()
             db.close()
+            time.sleep(60*10)
         else:
             for i, row in window.iterrows():
                 print(row['epic'],row['date'],row['macd'],row['signal'],row['rsi'],row['bullish_crossover'],row['rsi_cross_above_50'])
@@ -81,7 +82,7 @@ def traderbt():
         df = ind.calculate_rsi(df, 21)
         df['buy_signal'] = False
         df['sell_signal'] = False
-        window = df.iloc[len(df)-5:]
+        window = df.iloc[len(df)-3:]
         #Check the stop level and update if it rises
         low = window['low'].min()-8
         stopLevel = positions.iloc[-1]['stopLevel']
