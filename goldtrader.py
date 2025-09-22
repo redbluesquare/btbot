@@ -77,12 +77,8 @@ def traderbt():
         time.sleep(30)
     else:
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
-        df = price.load_ohlc(epics[1], '5MINUTE')
+        df = price.load_ohlc(epics[0], '5MINUTE', records=100)
         df = df.sort_values(by='date',ascending=True)
-        df = ind.calculate_macd(df, 5, 35, 5)
-        df = ind.calculate_rsi(df, 21)
-        df['buy_signal'] = False
-        df['sell_signal'] = False
         window = df.iloc[len(df)-3:]
         #Check the stop level and update if it rises
         low = window['low'].min()-2
@@ -91,6 +87,7 @@ def traderbt():
             # update the open position
             response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=positions.iloc[-1]['dealId'])
             print(response)
+            print(epics[0], low)
             db = sqlite3.connect('streamed_prices.db')
             c = db.cursor()
             c.execute(''' 
