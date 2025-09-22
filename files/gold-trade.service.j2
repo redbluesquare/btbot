@@ -1,12 +1,12 @@
 [Unit]
-Description=OHLC Lightstreamer Data Collector
+Description=Gold commodity trader
 After=network.target
 
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/opt/btbot_prod
-ExecStart=/opt/btbot_prod/.venv/bin/python dowtrader.py
+WorkingDirectory=/opt/btbot
+ExecStart=/opt/btbot/.venv/bin/python goldtrader.py
 Restart=always
 RestartSec=10
 Environment="PYTHONUNBUFFERED=1"

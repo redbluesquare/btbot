@@ -18,14 +18,13 @@ jobs:
     - name: Install dependencies
       run: |
         .venv/bin/python -m pip install --upgrade pip
-        .venv/bin/pip install e .
+#        .venv/bin/pip install e .
 #    - name: Run tests
 #      run: |
 #        .venv/bin/pytest tests/
   
   build:
     name: Build the app
-    if: ${{ github.ref == 'refs/main' }}
     needs: [ tests ]
     runs-on: [ self-hosted ]
     strategy:
@@ -33,8 +32,18 @@ jobs:
         python-version: [3.11]
     steps:
       - name: Checkout the repository
-        run: actions/checkout@v4
-      - name: package the files
+        uses: actions/checkout@v4
+      - name: Run Ansible playbook
         run: |
-          zip -r btbot.zip .
-          cp btbot.zip /opt/btbot.zip
+          ansible-playbook ansible/playbook.yaml --connection=local --inventory 127.0.0.1,
+#      - name: restart the services
+#        run: |
+#          sudo systemctl daemon-reexec
+#          sudo systemctl daemon-reload
+#          sudo systemctl enable ohlc-stream.service
+#          sudo systemctl restart ohlc-stream.service
+#          sudo systemctl enable dow-trade.service
+#          sudo systemctl restart dow-trade.service
+#          sudo systemctl enable gold-trade.service
+#          sudo systemctl restart gold-trade.service
+

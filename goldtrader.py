@@ -36,6 +36,7 @@ def traderbt():
         # No trade is open, continue and check if ready to open a new trade
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[0], '5MINUTE', records=100)
+        df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
         df = ind.calculate_rsi(df, 21)
         df['buy_signal'] = False
@@ -49,15 +50,14 @@ def traderbt():
             epic=window.iloc[-1]['epic']
             expiry='DFB'
             direction='BUY'
-            size='0.1'
+            size='0.5'
             order_type='MARKET'
             currency_code='GBP'
             guaranteed_stop=False
             force_open=True
-            stop_distance=window.iloc[-1]['close']-window['low'].min()+8
+            stop_distance=window.iloc[-1]['close']-window['low'].min()+4
             trade = te.open_trade(ig_service, epic, expiry=expiry, direction=direction, size=size,order_type=order_type,currency_code=currency_code
                         ,guaranteed_stop=guaranteed_stop, force_open=force_open, stop_distance=stop_distance)
-            print(epic, expiry, direction, size,order_type,currency_code,guaranteed_stop, force_open, stop_distance)
             print(trade)
             db = sqlite3.connect('streamed_prices.db')
             c = db.cursor()
@@ -69,25 +69,24 @@ def traderbt():
                             ,trade['level'], trade['size'], window.iloc[-1]['macd'], window.iloc[-1]['rsi'], 0))
             db.commit()
             db.close()
+            time.sleep(60*10)
         else:
             for i, row in window.iterrows():
                 print(row['epic'],row['date'],row['macd'],row['signal'],row['rsi'],row['bullish_crossover'],row['rsi_cross_above_50'])
             print('Buy condition:', buy_condition)
+        time.sleep(30)
     else:
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
-        df = price.load_ohlc(epics[1], '5MINUTE')
-        df = ind.calculate_macd(df, 5, 35, 5)
-        df = ind.calculate_rsi(df, 21)
-        df['buy_signal'] = False
-        df['sell_signal'] = False
-        window = df.iloc[len(df)-5:]
+        df = price.load_ohlc(epics[0], '5MINUTE', records=100)
+        df = df.sort_values(by='date',ascending=True)
+        window = df.iloc[len(df)-3:]
         #Check the stop level and update if it rises
-        low = window['low'].min()-8
+        low = window['low'].min()-2
         stopLevel = positions.iloc[-1]['stopLevel']
         if low > stopLevel:
             # update the open position
             response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=positions.iloc[-1]['dealId'])
-            print(response)
+            print(epics[0], low, response['dealStatus'], response['reason'])
             db = sqlite3.connect('streamed_prices.db')
             c = db.cursor()
             c.execute(''' 
@@ -98,8 +97,9 @@ def traderbt():
             db.commit()
             db.close()
         else:
-           print(row)
-    time.sleep(20)
+            for i, row in window.iterrows():
+                print(row)
+        time.sleep(60)
 while True:
     traderbt()
 

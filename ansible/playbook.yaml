@@ -1,0 +1,76 @@
+---
+- name: Deploy btbot from GitHub Actions runner
+  hosts: localhost
+  become: true
+  vars:
+    source_dir: "/home/pi/actions-runner/_work/btbot/btbot"
+    target_dir: "/opt/btbot"
+
+  tasks:
+    - name: Ensure target directory exists
+      file:
+        path: "{{ target_dir }}"
+        state: directory
+        owner: pi
+        group: pi
+        mode: '0755'
+
+    - name: Copy bot files to /opt/btbot
+      synchronize:
+        src: "{{ source_dir }}/"
+        dest: "{{ target_dir }}/"
+        delete: no
+        recursive: yes
+
+    - name: Ensure python3-venv is installed
+      apt:
+        name: python3-venv
+        state: present
+        update_cache: yes
+
+    - name: Create Python virtual environment if missing
+      command: python3 -m venv {{ target_dir }}/.venv
+      args:
+        creates: "{{ target_dir }}/.venv/bin/activate"
+
+    - name: Upgrade pip in the virtualenv
+      ansible.builtin.pip:
+        virtualenv: "{{ target_dir }}/.venv"
+        name: pip
+        state: latest
+
+    - name: Install project in editable mode
+      command: "{{ target_dir }}/.venv/bin/pip install -e ."
+      args:
+        chdir: "{{ target_dir }}"
+
+    - name: Render and deploy systemd unit templates
+      template:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item | basename | regex_replace('\\.j2$','') }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop: "{{ lookup('fileglob', '/opt/btbot/files/*.service.j2', wantlist=True) }}"
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Restart ohlc-stream service
+      systemd:
+        name: ohlc-stream.service
+        state: restarted
+        enabled: true
+
+    - name: Restart gold-trade service
+      systemd:
+        name: gold-trade.service
+        state: restarted
+        enabled: true
+
+    - name: Restart dow-trade service
+      systemd:
+        name: dow-trade.service
+        state: restarted
+        enabled: true

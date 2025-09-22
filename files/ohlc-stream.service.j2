@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/opt/btbot_prod
-ExecStart=/opt/btbot_prod/.venv/bin/python getprices.py
+WorkingDirectory=/opt/btbot
+ExecStart=/opt/btbot/.venv/bin/python getprices.py
 Restart=always
 RestartSec=10
 Environment="PYTHONUNBUFFERED=1"
