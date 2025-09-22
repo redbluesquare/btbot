@@ -36,6 +36,7 @@ def traderbt():
         # No trade is open, continue and check if ready to open a new trade
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[0], '5MINUTE', records=100)
+        df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
         df = ind.calculate_rsi(df, 21)
         df['buy_signal'] = False
@@ -77,6 +78,7 @@ def traderbt():
     else:
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
+        df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
         df = ind.calculate_rsi(df, 21)
         df['buy_signal'] = False

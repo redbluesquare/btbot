@@ -36,6 +36,7 @@ def traderbt():
         # No trade is open, continue and check if ready to open a new trade
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
+        df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
         df = ind.calculate_rsi(df, 21)
         df['buy_signal'] = False
@@ -57,7 +58,6 @@ def traderbt():
             stop_distance=window.iloc[-1]['close']-window['low'].min()+8
             trade = te.open_trade(ig_service, epic, expiry=expiry, direction=direction, size=size,order_type=order_type,currency_code=currency_code
                         ,guaranteed_stop=guaranteed_stop, force_open=force_open, stop_distance=stop_distance)
-            print(epic, expiry, direction, size,order_type,currency_code,guaranteed_stop, force_open, stop_distance)
             print(trade)
             db = sqlite3.connect('streamed_prices.db')
             c = db.cursor()
@@ -78,6 +78,7 @@ def traderbt():
     else:
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
+        df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
         df = ind.calculate_rsi(df, 21)
         df['buy_signal'] = False
