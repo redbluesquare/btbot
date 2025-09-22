@@ -43,7 +43,7 @@ def traderbt():
         df['sell_signal'] = False
         window = df.iloc[len(df)-3:]
         buy_condition = window['bullish_crossover'].any() & window['rsi_cross_above_50'].any()
-        if buy_condition and ind.is_within_trading_hours(window.iloc[-1]['date'], 9, 19):
+        if buy_condition and ind.is_within_trading_hours(window.iloc[-1]['date'], 7, 19):
             buy_index = window.index[-1]
             df.at[buy_index, 'buy_signal'] = True
             # create an order
