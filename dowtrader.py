@@ -41,7 +41,7 @@ def traderbt():
         df = ind.calculate_rsi(df, 21)
         df['buy_signal'] = False
         df['sell_signal'] = False
-        window = df.iloc[len(df)-3:]
+        window = df.iloc[len(df)-6:]
         buy_condition = window['bullish_crossover'].any() & window['rsi_cross_above_50'].any()
         if buy_condition and ind.is_within_trading_hours(window.iloc[-1]['date'], 9, 19):
             buy_index = window.index[-1]
@@ -79,11 +79,7 @@ def traderbt():
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
-        df = ind.calculate_macd(df, 5, 35, 5)
-        df = ind.calculate_rsi(df, 21)
-        df['buy_signal'] = False
-        df['sell_signal'] = False
-        window = df.iloc[len(df)-3:]
+        window = df.iloc[len(df)-4:]
         #Check the stop level and update if it rises
         low = window['low'].min()-8
         stopLevel = positions.iloc[-1]['stopLevel']
@@ -101,7 +97,8 @@ def traderbt():
             db.commit()
             db.close()
         else:
-           print(row)
+            for i, row in window.iterrows():
+                print(row)
         time.sleep(60)
 while True:
     traderbt()

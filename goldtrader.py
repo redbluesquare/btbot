@@ -86,8 +86,7 @@ def traderbt():
         if low > stopLevel:
             # update the open position
             response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=positions.iloc[-1]['dealId'])
-            print(response)
-            print(epics[0], low)
+            print(epics[0], low, response['dealStatus'], response['reason'])
             db = sqlite3.connect('streamed_prices.db')
             c = db.cursor()
             c.execute(''' 
@@ -98,7 +97,8 @@ def traderbt():
             db.commit()
             db.close()
         else:
-           print(row)
+            for i, row in window.iterrows():
+                print(row)
         time.sleep(60)
 while True:
     traderbt()
