@@ -43,7 +43,7 @@ def traderbt():
         df['sell_signal'] = False
         window = df.iloc[len(df)-3:]
         buy_condition = window['bullish_crossover'].any() & window['rsi_cross_above_50'].any()
-        if buy_condition and ind.is_within_trading_hours(window.iloc[-1]['date'], 9, 19):
+        if buy_condition and ind.is_within_trading_hours(window.iloc[-1]['date'], 7, 19):
             buy_index = window.index[-1]
             df.at[buy_index, 'buy_signal'] = True
             # create an order
@@ -55,7 +55,7 @@ def traderbt():
             currency_code='GBP'
             guaranteed_stop=False
             force_open=True
-            stop_distance=window.iloc[-1]['close']-window['low'].min()+4
+            stop_distance=window.iloc[-3]['close']-window['low'].min()+4
             trade = te.open_trade(ig_service, epic, expiry=expiry, direction=direction, size=size,order_type=order_type,currency_code=currency_code
                         ,guaranteed_stop=guaranteed_stop, force_open=force_open, stop_distance=stop_distance)
             print(trade)
@@ -81,7 +81,7 @@ def traderbt():
         df = df.sort_values(by='date',ascending=True)
         window = df.iloc[len(df)-3:]
         #Check the stop level and update if it rises
-        low = window['low'].min()-2
+        low = window['low'].min()-1
         stopLevel = positions.iloc[-1]['stopLevel']
         if low > stopLevel:
             # update the open position
