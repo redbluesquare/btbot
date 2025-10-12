@@ -16,7 +16,9 @@ class Indicators():
         #mad = tp.rolling(window=period).apply(lambda x: pd.Series(x).mad(skipna=True))
         mad = tp.rolling(window=period).apply(self.mad, raw=True)
         cci = (tp - sma) / (0.015 * mad)
-        df['CCI'] = cci
+        df['cci'] = cci
+        df['cci_prev'] = df['cci'].shift(1)
+        df['cci_bullish_crossover'] = (df['cci_prev'] < 100) & (df['cci'] > 100)
         return df
 
     def calculate_macd(self, df, short=5, long=35, signal=5):
