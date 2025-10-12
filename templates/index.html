@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>BTBot Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+</head>
+<body>
+  <h1>OHLC and Trades</h1>
+
+  <canvas id="priceChart" width="900" height="400"></canvas>
+  <h2>Trades</h2>
+  <canvas id="tradesChart" width="900" height="200"></canvas>
+
+  <script>
+  // helper: ISO -> JS Date label
+  function timeLabel(iso) { return new Date(iso).toLocaleString(); }
+
+  async function loadData() {
+    const [ohlcRes, tradesRes] = await Promise.all([
+      fetch('/api/ohlc'), fetch('/api/trades')
+    ]);
+    const ohlc = await ohlcRes.json();
+    const trades = await tradesRes.json();
+    renderPriceChart(ohlc, trades);
+    renderTradesChart(trades);
+  }
+
+  function renderPriceChart(ohlc, trades) {
+    const labels = ohlc.map(r => r.date);
+    const closes = ohlc.map(r => r.close);
+
+    // prepare trade scatter points mapped to price chart x/index
+    const tradePoints = trades.map(t => ({
+      x: t.trade_date,
+      y: t.price,
+      type: t.trade_type,
+      label: `${t.trade_type} ${t.epic} @ ${t.price} (pnl:${t.pnl})`
+    }));
+
+    const ctx = document.getElementById('priceChart').getContext('2d');
+
+    // use time axis for x (Chart.js time scale)
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+            {
+                label: 'Close',
+                data: ohlc.map(r => ({ x: r.date, y: r.close })), // date = ISO string
+                parsing: false,
+            },
+            {
+                label: 'Trades',
+                data: trades.map(t => ({ x: t.trade_date, y: t.price, label: t.label })),
+                type: 'scatter',
+                parsing: false,
+            }
+            ]
+        },
+        options: {
+            scales: {
+            x: {
+                type: 'time',
+                time: {
+                tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+                displayFormats: { minute: 'HH:mm', hour: 'HH:mm' }
+                }
+            },
+            y: { title: { display: true, text: 'Price' } }
+            }
+        }
+    });
+
+  }
+
+  function renderTradesChart(trades) {
+    // simple bar or table-like view by trade_type count or pnl over time
+    const labels = trades.map(t => t.trade_date);
+    const pnls = trades.map(t => t.pnl);
+
+    const ctx = document.getElementById('tradesChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels.map(timeLabel),
+        datasets: [{
+          label: 'PnL',
+          data: pnls,
+          backgroundColor: pnls.map(v => v >= 0 ? 'rgba(0,128,0,0.6)' : 'rgba(255,0,0,0.6)')
+        }]
+      },
+      options: {
+        scales: {
+          x: { title: { display: true, text: 'Trade Time' } },
+          y: { title: { display: true, text: 'PnL' } }
+        }
+      }
+    });
+  }
+
+  loadData();
+  </script>
+</body>
+</html>

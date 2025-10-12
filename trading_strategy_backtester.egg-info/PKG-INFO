@@ -11,6 +11,9 @@ Requires-Dist: matplotlib>=3.7
 Requires-Dist: trading-ig>=0.0.6
 Requires-Dist: schedule>=1.2.0
 Requires-Dist: lightstreamer-client-lib>=1.0.3
+Requires-Dist: pytest>=8.4.2
+Requires-Dist: python-dotenv>=1.1.1
+Requires-Dist: Flask>=2.2
 
 # btBot
 
@@ -26,4 +29,13 @@ PASSWORD=<<user-password>>
 ENCRYPTED_PASSWORD=null
 API_KEY=<<enter_the_api_key>>
 BASE_URL=https://demo-api.ig.com/gateway/deal/
+```
+
+```bash
+sudo journalctl -u ohlc-stream.service -f
+```
+
+```bash
+sudo systemctl status ohlc-stream.service
+
 ```
