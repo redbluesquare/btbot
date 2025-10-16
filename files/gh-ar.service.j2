@@ -1,0 +1,23 @@
+[Unit]
+Description=GitHub Actions Runner (self-hosted) on Raspberry Pi
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/actions-runner          # update to your runner path
+ExecStart=/bin/bash -lc './run.sh'
+Restart=always
+RestartSec=60s
+StartLimitBurst=5
+StartLimitIntervalSec=60
+TimeoutStartSec=120
+KillMode=process
+Environment=RUNNER_ALLOW_RUNASROOT=0
+# Optional: limit resources
+# MemoryMax=300M
+# CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

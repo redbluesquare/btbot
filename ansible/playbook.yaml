@@ -68,6 +68,12 @@
         name: gold-trade.service
         state: restarted
         enabled: true
+        
+    - name: Restart gh-ar service
+      systemd:
+        name: gh-ar.service
+        state: restarted
+        enabled: true
 
     - name: Restart dow-trade service
       systemd:
