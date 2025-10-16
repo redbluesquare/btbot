@@ -51,6 +51,7 @@ class Indicators():
         df['rsi_prev'] = df['rsi'].shift(1)
         df['rsi_cross_above_50'] = (df['rsi_prev'] < 50) & (df['rsi'] > 50)
         df['rsi_c'] = np.where(df['rsi_cross_above_50'], df['rsi'], np.nan)
+        df['rsi_bullish'] = df['rsi'] > 50
         return df
     
     def find_combined_signals(self, df):
