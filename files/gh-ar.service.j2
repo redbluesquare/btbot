@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/home/pi/actions-runner          # update to your runner path
-ExecStart=/usr/bin/bash -lc '/home/pi/actions-runner/./run.sh'
+WorkingDirectory=/home/pi/actions-runner
+ExecStart=/home/pi/actions-runner/launcher.sh
 Restart=always
 RestartSec=60s
 KillMode=process
