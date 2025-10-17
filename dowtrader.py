@@ -43,8 +43,9 @@ def traderbt():
         df['buy_signal'] = False
         df['sell_signal'] = False
         window = df.iloc[len(df)-6:]
-        buy_condition = window['bullish_crossover'].any() & window['rsi_cross_above_50'].any()
-        if (buy_condition or window['cci_bullish_crossover'].any()) and ind.is_within_trading_hours(window.iloc[-1]['date'], 9, 19):
+        buy_condition1 = window['bullish_crossover'].any() & window['rsi_cross_above_50'].any()
+        buy_condition2 = window['bullish_crossover'].any() & window['rsi_bullish'].any()
+        if (buy_condition1 or buy_condition2 or window['cci_bullish_crossover'].any()) and ind.is_within_trading_hours(window.iloc[-1]['date'], 9, 19):
             buy_index = window.index[-1]
             df.at[buy_index, 'buy_signal'] = True
             # create an order
@@ -74,7 +75,7 @@ def traderbt():
         else:
             for i, row in window.iterrows():
                 print(row['epic'],row['date'],row['macd'],row['signal'],row['rsi'],row['bullish_crossover'],row['rsi_cross_above_50'], row['cci_bullish_crossover'])
-            print('Buy condition:', buy_condition)
+            print('Buy condition:', buy_condition1, buy_condition2)
         time.sleep(30)
     else:
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
