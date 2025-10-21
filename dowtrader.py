@@ -105,6 +105,6 @@ def traderbt():
         time.sleep(60)
 while True:
     traderbt()
-    if ind.is_within_trading_hours(datetime.timestamp, 22,23):
+    if ind.is_within_trading_hours(datetime.timestamp, 0,1):
         app.main()
         time.sleep(60*61)
