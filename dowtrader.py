@@ -13,6 +13,7 @@ import models.backtests as backtests
 import models.setup as setup
 import schedule
 from datetime import datetime
+import app
 
 load_dotenv()  # take environment variables
 usr = user.User()
@@ -104,5 +105,6 @@ def traderbt():
         time.sleep(60)
 while True:
     traderbt()
-
-
+    if ind.is_within_trading_hours(datetime.timestamp, 22,23):
+        app.main()
+        time.sleep(60*61)
