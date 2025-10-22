@@ -12,7 +12,8 @@ import models.trade_executor as trade_executor
 import models.backtests as backtests
 import models.setup as setup
 import schedule
-from datetime import datetime
+from datetime import datetime, time as dt_time
+import app
 
 load_dotenv()  # take environment variables
 usr = user.User()
@@ -71,7 +72,7 @@ def traderbt():
                             ,trade['level'], trade['size'], window.iloc[-1]['macd'], window.iloc[-1]['rsi'], 0))
             db.commit()
             db.close()
-            time.sleep(60*10)
+            time.sleep(60*15)
         else:
             for i, row in window.iterrows():
                 print(row['epic'],row['date'],row['macd'],row['signal'],row['rsi'],row['bullish_crossover'],row['rsi_cross_above_50'], row['cci_bullish_crossover'])
@@ -81,7 +82,7 @@ def traderbt():
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
-        window = df.iloc[len(df)-4:]
+        window = df.iloc[len(df)-2:]
         #Check the stop level and update if it rises
         low = window['low'].min()-8
         stopLevel = positions.iloc[-1]['stopLevel']
@@ -102,7 +103,10 @@ def traderbt():
             for i, row in window.iterrows():
                 print(row)
         time.sleep(60)
+    now = datetime.now().time()
+    if dt_time(1, 0) <= now < dt_time(2, 0):
+        app.main()
+        time.sleep(60*61)
 while True:
     traderbt()
-
-
+    
