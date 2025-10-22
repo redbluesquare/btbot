@@ -34,22 +34,24 @@ def getTradeData():
         for i, t in get_trades.iterrows()
     ])
 
+    if get_trades.empty == False:
+        # Add day column
+        df["day"] = df["trade_date"].dt.date
 
-    # Add day column
-    df["day"] = df["trade_date"].dt.date
-
-    # Group by day and epic
-    summary = (
-        df.groupby(["day", "epic"])
-        .agg(
-            total_trades=("dealId", "count"),
-            net_pnl=("pnl", "sum"),
-            avg_stake=("stake", "mean"),
-            avg_open=("price_open", "mean"),
-            avg_close=("price_close", "mean")
+        # Group by day and epic
+        summary = (
+            df.groupby(["day", "epic"])
+            .agg(
+                total_trades=("dealId", "count"),
+                net_pnl=("pnl", "sum"),
+                avg_stake=("stake", "mean"),
+                avg_open=("price_open", "mean"),
+                avg_close=("price_close", "mean")
+            )
+            .reset_index()
         )
-        .reset_index()
-    )
+    else: 
+        summary = df
 
     # summary = pd.DataFrame(...) from your groupby logic
     html_table = summary.to_html(

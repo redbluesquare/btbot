@@ -12,7 +12,7 @@ import models.trade_executor as trade_executor
 import models.backtests as backtests
 import models.setup as setup
 import schedule
-from datetime import datetime
+from datetime import datetime, time as dt_time
 import app
 
 load_dotenv()  # take environment variables
@@ -103,8 +103,10 @@ def traderbt():
             for i, row in window.iterrows():
                 print(row)
         time.sleep(60)
-while True:
-    traderbt()
-    if ind.is_within_trading_hours(datetime, 0,1):
+    now = datetime.now().time()
+    if dt_time(1, 0) <= now < dt_time(2, 0):
         app.main()
         time.sleep(60*61)
+while True:
+    traderbt()
+    
