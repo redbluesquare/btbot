@@ -36,14 +36,7 @@ jobs:
       - name: Run Ansible playbook
         run: |
           ansible-playbook ansible/playbook.yaml --connection=local --inventory 127.0.0.1,
-#      - name: restart the services
+#      - name: Copy the env file
 #        run: |
-#          sudo systemctl daemon-reexec
-#          sudo systemctl daemon-reload
-#          sudo systemctl enable ohlc-stream.service
-#          sudo systemctl restart ohlc-stream.service
-#          sudo systemctl enable dow-trade.service
-#          sudo systemctl restart dow-trade.service
-#          sudo systemctl enable gold-trade.service
-#          sudo systemctl restart gold-trade.service
+#          sudo cp /home/pi/.env.j2 /opt/btbot/.env
 

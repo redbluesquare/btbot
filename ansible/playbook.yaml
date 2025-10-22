@@ -44,6 +44,9 @@
       args:
         chdir: "{{ target_dir }}"
 
+    - name: Copy the .env temlplate file
+      command: "cp /home/pi/.env.j2 /opt/btbot/.env"
+
     - name: Render and deploy systemd unit templates
       template:
         src: "{{ item }}"
