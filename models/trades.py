@@ -17,8 +17,8 @@ class Trades():
     
     def prev_day_range(self, tz=timezone.utc):
         now = datetime.now(tz)
-        prev = (now - timedelta(days=5)).replace(hour=0, minute=0, second=0, microsecond=0)
-        next_day = prev + timedelta(days=5)
+        prev = (now - timedelta(days=10)).replace(hour=0, minute=0, second=0, microsecond=0)
+        next_day = prev + timedelta(days=10)
         return prev, next_day
 
     def getPreviousTrades(self):

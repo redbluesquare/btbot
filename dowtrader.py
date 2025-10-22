@@ -104,7 +104,7 @@ def traderbt():
                 print(row)
         time.sleep(60)
     now = datetime.now().time()
-    if dt_time(1, 0) <= now < dt_time(2, 0):
+    if dt_time(22, 0) <= now < dt_time(23, 0):
         app.main()
         time.sleep(60*61)
 while True:
