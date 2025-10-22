@@ -26,8 +26,6 @@ def getTradeData():
             "epic": t["instrumentName"],
             "trade_date": pd.to_datetime(t["dateUtc"]),
             "dealId": t["reference"],
-            "price_open": float(t["openLevel"].replace("-", "0")),
-            "price_close": float(t["closeLevel"].replace("-", "0")),
             "stake": float(t["size"].replace("+", "").replace("-", "0")),
             "pnl": float(t["profitAndLoss"].replace("£", "")),
         }
@@ -45,8 +43,6 @@ def getTradeData():
                 total_trades=("dealId", "count"),
                 net_pnl=("pnl", "sum"),
                 avg_stake=("stake", "mean"),
-                avg_open=("price_open", "mean"),
-                avg_close=("price_close", "mean")
             )
             .reset_index()
         )
