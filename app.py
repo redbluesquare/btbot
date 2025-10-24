@@ -23,13 +23,13 @@ def getTradeData():
     accounts = account.getAccountDetails()
     acc = pd.DataFrame([
         {
-            "":t['accountId'],
-            "":t['accountName'],
-            "":t['accountType'],
-            "":float(t['available']),
-            "":float(t['balance']),
-            "":float(t['deposit']),
-            "":float(t['profitLoss']),
+            "AccountId":t['accountId'],
+            "AccountName":t['accountName'],
+            "AccType":t['accountType'],
+            "Available":float(t['available']),
+            "Balance":float(t['balance']),
+            "Deposit":float(t['deposit']),
+            "PnL":float(t['profitLoss']),
         }
         for i, t in accounts.iterrows()
     ])
