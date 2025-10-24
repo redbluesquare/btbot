@@ -27,3 +27,17 @@ class Trades():
         from_dt, to_dt = self.prev_day_range()
         activities = ig_service.fetch_transaction_history(from_date=str(from_dt)[:10], to_date=str(to_dt)[:10], page_size=999)
         return activities
+    
+class Account():
+    def __init__(self):
+        self.user = user.User()
+        self.API_KEY = os.getenv('API_KEY')
+        self.username = os.getenv('IDENTIFIER')
+        self.user_pw = os.getenv('PASSWORD')
+        self.acc_type = os.getenv('ACC_TYPE')
+        pass
+    def getAccountDetails(self):
+        ig_service = self.user.login_ig(IGService, self.username, self.user_pw, self.API_KEY, acc_type=self.acc_type)
+        ig_service.create_session()
+        accounts = ig_service.fetch_accounts()
+        return accounts

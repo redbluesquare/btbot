@@ -16,10 +16,30 @@ SMTP_PORT    = 587
 USERNAME     = os.getenv('EMAIL_ADDRESS')
 APP_PASSWORD = os.getenv('EMAIL_APP_PASSWORD')
 
-trades = trades.Trades()
 def getTradeData():
-    get_trades = trades.getPreviousTrades()
-
+    trade = trades.Trades()
+    account = trades.Account()
+    get_trades = trade.getPreviousTrades()
+    accounts = account.getAccountDetails()
+    acc = pd.DataFrame([
+        {
+            "":t['accountId'],
+            "":t['accountName'],
+            "":t['accountType'],
+            "":float(t['available']),
+            "":float(t['balance']),
+            "":float(t['deposit']),
+            "":float(t['profitLoss']),
+        }
+        for i, t in accounts.iterrows()
+    ])
+    html_tbl = acc.to_html(
+        index=False,
+        border=1,
+        justify="center",
+        classes="trade-summary",
+        float_format="%.2f"
+    )
     # Normalize and clean
     df = pd.DataFrame([
         {
@@ -38,11 +58,10 @@ def getTradeData():
 
         # Group by day and epic
         summary = (
-            df.groupby(["day", "epic"])
+            df.groupby(["day", "epic", "stake"])
             .agg(
                 total_trades=("dealId", "count"),
                 net_pnl=("pnl", "sum"),
-                avg_stake=("stake", "mean"),
             )
             .reset_index()
         )
@@ -57,7 +76,7 @@ def getTradeData():
         classes="trade-summary",
         float_format="%.2f"
     )
-    return html_table
+    return [html_tbl, html_table]
 
 def send_email(to_addr, subject, html_body):
     # 1. Root container: related = HTML + images
@@ -90,9 +109,11 @@ def main():
         send_email(
             to_addr    = 'usher_darryl@hotmail.com',
             subject    = "Daily Trade Summary",
-            html_body  = html_body
+            html_body  = html_body[0]+'<br><br>'+html_body[1]
         )
         print(f"✔ Sent to {'usher_darryl@hotmail.com'}")
     except Exception as e:
         print(f"✖ Failed for {'usher_darryl@hotmail.com'}: {e}")
     time.sleep(1)
+
+main()
