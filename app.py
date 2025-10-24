@@ -76,7 +76,7 @@ def getTradeData():
         classes="trade-summary",
         float_format="%.2f"
     )
-    return [html_tbl, html_table]
+    return html_tbl, html_table
 
 def send_email(to_addr, subject, html_body):
     # 1. Root container: related = HTML + images
@@ -104,12 +104,12 @@ def send_email(to_addr, subject, html_body):
         server.send_message(msg_root)
 
 def main():
-    html_body = getTradeData()
+    html_header, html_body = getTradeData()
     try:
         send_email(
             to_addr    = 'usher_darryl@hotmail.com',
             subject    = "Daily Trade Summary",
-            html_body  = html_body[0]+'<br><br>'+html_body[1]
+            html_body  = html_header+'<br><br>'+html_body
         )
         print(f"✔ Sent to {'usher_darryl@hotmail.com'}")
     except Exception as e:
