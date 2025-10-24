@@ -37,7 +37,6 @@ def getTradeData():
         index=False,
         border=1,
         justify="center",
-        classes="trade-summary",
         float_format="%.2f"
     )
     # Normalize and clean
