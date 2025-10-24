@@ -61,17 +61,16 @@ def getTradeData():
             )
             .reset_index()
         )
-    else: 
-        summary = df
         # Step 1: Get daily total PnL
-        daily_pnl = summary.groupby("day")["net_pnl"].sum().sort_index(ascending=False)
+        daily_pnl = summary.groupby(["day", "epic", "stake"])["net_pnl"].sum().sort_index(ascending=False)
 
         # Step 2: Compute rolling balance backwards from known final balance
         balance = daily_pnl[::-1].cumsum()[::-1] + acc['Balance'][0] - daily_pnl.sum()
 
         # Step 3: Map rolling balance back to summary
         summary["balance"] = summary["day"].map(balance)
-
+    else: 
+        summary = df
     # summary = pd.DataFrame(...) from your groupby logic
     html_table = summary.to_html(
         index=False,
