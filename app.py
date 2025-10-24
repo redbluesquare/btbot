@@ -26,10 +26,7 @@ def getTradeData():
             "AccountId":t['accountId'],
             "AccountName":t['accountName'],
             "AccType":t['accountType'],
-            "Available":float(t['available']),
             "Balance":float(t['balance']),
-            "Deposit":float(t['deposit']),
-            "PnL":float(t['profitLoss']),
         }
         for i, t in accounts.iterrows()
     ])
