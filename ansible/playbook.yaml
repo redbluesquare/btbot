@@ -83,3 +83,9 @@
         name: dow-trade.service
         state: restarted
         enabled: true
+
+    - name: Restart ftse-trade service
+      systemd:
+        name: ftse-trade.service
+        state: restarted
+        enabled: true

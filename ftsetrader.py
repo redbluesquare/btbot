@@ -1,7 +1,5 @@
 from trading_ig import IGService
 import sqlite3
-import pandas as pd
-import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 import time
 import os
@@ -11,9 +9,7 @@ import models.prices as prices
 import models.trade_executor as trade_executor
 import models.backtests as backtests
 import models.setup as setup
-import schedule
-from datetime import datetime, time as dt_time
-import app
+
 
 load_dotenv()  # take environment variables
 usr = user.User()
@@ -35,8 +31,8 @@ def traderbt():
     positions = ig_service.fetch_open_positions()
     if positions.empty:
         # No trade is open, continue and check if ready to open a new trade
-        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
-        df = price.load_ohlc(epics[1], '5MINUTE')
+        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
+        df = price.load_ohlc(epics[2], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
         df = ind.calculate_rsi(df, 21)
@@ -79,12 +75,12 @@ def traderbt():
             print('Buy condition:', buy_condition1, buy_condition2)
         time.sleep(30)
     else:
-        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
-        df = price.load_ohlc(epics[1], '5MINUTE')
+        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
+        df = price.load_ohlc(epics[2], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
-        window = df.iloc[len(df)-2:]
+        window = df.iloc[len(df)-3:]
         #Check the stop level and update if it rises
-        low = window['low'].min()-8
+        low = window['low'].min()-4
         stopLevel = positions.iloc[-1]['stopLevel']
         if low > stopLevel:
             # update the open position
@@ -103,10 +99,6 @@ def traderbt():
             for i, row in window.iterrows():
                 print(row)
         time.sleep(60)
-    now = datetime.now().time()
-    if dt_time(21, 0) <= now < dt_time(21, 30):
-        app.main()
-        time.sleep(60*30)
 while True:
     traderbt()
     
