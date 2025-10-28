@@ -49,12 +49,12 @@ def traderbt():
             epic=window.iloc[-1]['epic']
             expiry='DFB'
             direction='BUY'
-            size='0.1'
+            size='0.2'
             order_type='MARKET'
             currency_code='GBP'
             guaranteed_stop=False
             force_open=True
-            stop_distance=window.iloc[-1]['close']-window['low'].min()+8
+            stop_distance=window.iloc[-1]['close']-window['low'].min()+4
             trade = te.open_trade(ig_service, epic, expiry=expiry, direction=direction, size=size,order_type=order_type,currency_code=currency_code
                         ,guaranteed_stop=guaranteed_stop, force_open=force_open, stop_distance=stop_distance)
             print(trade)
@@ -78,7 +78,7 @@ def traderbt():
         epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
         df = price.load_ohlc(epics[2], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
-        window = df.iloc[len(df)-3:]
+        window = df.iloc[len(df)-1:]
         #Check the stop level and update if it rises
         low = window['low'].min()-4
         stopLevel = positions.iloc[-1]['stopLevel']
