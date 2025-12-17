@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import models.user as user
 from datetime import datetime, timedelta, timezone
+import pandas as pd
 load_dotenv()  # take environment variables
 
 class Trades():
@@ -27,6 +28,18 @@ class Trades():
         from_dt, to_dt = self.prev_day_range()
         activities = ig_service.fetch_transaction_history(from_date=str(from_dt)[:10], to_date=str(to_dt)[:10], page_size=999)
         return activities
+    
+    def get_trades(self, db, c, epic, limit=200):
+        query = """SELECT epic, trade_date, trade_type, dealId, dealStatus, price, stake, macd, rsi, pnl 
+                    FROM trade_data 
+                    WHERE epic = ?
+                    ORDER BY trade_date DESC LIMIT ?"""
+        c.execute(query, (epic, limit,))
+        rows = c.fetchall()
+        results = [dict(row) for row in rows]
+        df = pd.DataFrame(results)
+        df["trade_date"] = pd.to_datetime(df["trade_date"])
+        return df.sort_values(by="trade_date",ascending=False)
     
 class Account():
     def __init__(self):

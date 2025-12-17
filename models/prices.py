@@ -1,6 +1,7 @@
 import json
 import requests
 import models.user as user
+import models.indicators as indicators
 import os
 import sqlite3
 import pandas as pd
@@ -11,6 +12,34 @@ class Prices():
         self.user = user.User()
         
         pass
+    
+    def get_ohlc(self, db, c, epic, scale='1MINUTE', records=100):
+        ind = indicators.Indicators()
+        query = """
+            SELECT epic, date, (bid_open+offer_open)/2 open
+            ,(bid_high+offer_high)/2 high
+            ,(bid_low+offer_low)/2 low
+            ,(bid_close+offer_close)/2 close
+            FROM ohlc_data
+            WHERE epic = ? AND scale = ?
+            ORDER BY date DESC LIMIT ?
+        """
+        c.execute(query, (epic, scale, records))
+        rows = c.fetchall()
+        results = [dict(row) for row in rows]
+        df = pd.DataFrame(results)
+        df["open"]  = pd.to_numeric(df["open"], errors="coerce")
+        df["high"]  = pd.to_numeric(df["high"], errors="coerce")
+        df["low"]   = pd.to_numeric(df["low"], errors="coerce")
+        df["close"] = pd.to_numeric(df["close"], errors="coerce")
+        # Convert date to datetime and set index
+        df["date"] = pd.to_datetime(df["date"])
+        df = df.sort_values(by='date',ascending=True)
+        df = ind.calculate_cci(df)
+        df = ind.calculate_macd(df)
+        df = ind.calculate_rsi(df)
+        df = df.sort_values(by='date',ascending=False)
+        return df
     
     def load_ohlc(self, epic, scale='1MINUTE', db_path="streamed_prices.db", records=100):
         """

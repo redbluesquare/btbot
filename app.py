@@ -110,5 +110,3 @@ def main():
     except Exception as e:
         print(f"✖ Failed for {'usher_darryl@hotmail.com'}: {e}")
     time.sleep(1)
-
-main()

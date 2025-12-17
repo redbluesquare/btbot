@@ -89,3 +89,11 @@
         name: ftse-trade.service
         state: restarted
         enabled: true
+
+    - name: Ensure Raspberry Pi reboots daily at 11pm
+      ansible.builtin.cron:
+        name: "Daily reboot at 11pm"
+        minute: "0"
+        hour: "23"
+        job: "/sbin/shutdown -r now"
+        user: "root"
