@@ -19,6 +19,7 @@ class Indicators():
         df['cci'] = cci
         df['cci_prev'] = df['cci'].shift(1)
         df['cci_bullish_crossover'] = (df['cci_prev'] < 100) & (df['cci'] > 100)
+        df['cci_bearish_crossover'] = (df['cci_prev'] > -100) & (df['cci'] < -100)
         return df
 
     def calculate_macd(self, df, short=5, long=35, signal=5):
@@ -34,6 +35,7 @@ class Indicators():
         df['macd_prev'] = df['macd'].shift(1)
         df['signal_prev'] = df['signal'].shift(1)
         df['bullish_crossover'] = (df['macd_prev'] < df['signal_prev']) & (df['macd'] > df['signal'])
+        df['bearish_crossover'] = (df['macd_prev'] > df['signal_prev']) & (df['macd'] < df['signal'])
         df['bc'] = np.where(df['bullish_crossover'], df['macd'], np.nan)
         return df
 
@@ -52,6 +54,7 @@ class Indicators():
         df['rsi_cross_above_50'] = (df['rsi_prev'] < 50) & (df['rsi'] > 50)
         df['rsi_c'] = np.where(df['rsi_cross_above_50'], df['rsi'], np.nan)
         df['rsi_bullish'] = df['rsi'] > 50
+        df['rsi_bearish'] = df['rsi'] < 50
         return df
     
     def find_combined_signals(self, df):
