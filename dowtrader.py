@@ -109,17 +109,15 @@ def traderbt():
     else:
         df = price.load_ohlc(epics[1], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
-        window = df.iloc[len(df)-2:]
         if details['direction'] == 'BUY':
+            window = df.iloc[len(df)-2:]
             #Check the stop level and update if it rises
             low = window['low'].min()-8
             stopLevel = details['stopLevel']
-            print('BUY',low, stopLevel)
             if low > stopLevel:
                 # update the open position
                 response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=details['dealId'])
                 # Check if it updates
-                print(response)
                 db = sqlite3.connect('streamed_prices.db')
                 c = db.cursor()
                 c.execute('''   UPDATE trade_data 
@@ -129,10 +127,10 @@ def traderbt():
                 db.commit()
                 db.close()
         if details['direction'] == 'SELL':
+            window = df.iloc[len(df)-1:]
             #Check the stop level and update if it rises
             high = window['high'].max()+8
             stopLevel = details['stopLevel']
-            print('SELL',high, stopLevel)
             if high < stopLevel:
                 # update the open position
                 response = ig_service.update_open_position(limit_level=None, stop_level=high, deal_id=details['dealId'])
