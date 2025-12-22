@@ -32,10 +32,16 @@ acc_type = os.getenv('ACC_TYPE')
 def traderbt():
     ig_service = usr.login_ig(IGService, username, user_pw, API_KEY, acc_type=acc_type)
     ig_service.create_session()
+    details = None
+    epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
     positions = ig_service.fetch_open_positions()
-    if positions.empty:
+    p = positions.to_dict(orient='records')
+    for item in p:
+        if item['epic'] == epics[1]:
+            details = item
+            break
+    if details == None:
         # No trade is open, continue and check if ready to open a new trade
-        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
@@ -62,7 +68,6 @@ def traderbt():
             stop_distance=window.iloc[-1]['close']-window['low'].min()+8
             trade = te.open_trade(ig_service, epic, expiry=expiry, direction=direction, size=size,order_type=order_type,currency_code=currency_code
                         ,guaranteed_stop=guaranteed_stop, force_open=force_open, stop_distance=stop_distance)
-            print(trade)
             db = sqlite3.connect('streamed_prices.db')
             c = db.cursor()
             c.execute(''' 
@@ -102,33 +107,31 @@ def traderbt():
             time.sleep(60*15)
         time.sleep(30)
     else:
-        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP']
         df = price.load_ohlc(epics[1], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
         window = df.iloc[len(df)-2:]
-        if positions.iloc[-1]['stopLevel'] == 'BUY':
+        if details['direction'] == 'BUY':
             #Check the stop level and update if it rises
             low = window['low'].min()-8
-            stopLevel = positions.iloc[-1]['stopLevel']
+            stopLevel = details['stopLevel']
             if low > stopLevel:
                 # update the open position
-                response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=positions.iloc[-1]['dealId'])
+                response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=details['dealId'])
                 db = sqlite3.connect('streamed_prices.db')
                 c = db.cursor()
-                c.execute(''' 
-                                UPDATE trade_data 
+                c.execute('''   UPDATE trade_data 
                                 SET stopLevel = ?
                                 where dealId = ?
                             ''',(response['stopLevel'],  response['dealId']))
                 db.commit()
                 db.close()
-        if positions.iloc[-1]['stopLevel'] == 'SELL':
+        if details['direction'] == 'SELL':
             #Check the stop level and update if it rises
             high = window['high'].max()+8
-            stopLevel = positions.iloc[-1]['stopLevel']
+            stopLevel = details['stopLevel']
             if high < stopLevel:
                 # update the open position
-                response = ig_service.update_open_position(limit_level=None, stop_level=high, deal_id=positions.iloc[-1]['dealId'])
+                response = ig_service.update_open_position(limit_level=None, stop_level=high, deal_id=details['dealId'])
                 db = sqlite3.connect('streamed_prices.db')
                 c = db.cursor()
                 c.execute(''' 
