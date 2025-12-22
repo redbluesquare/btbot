@@ -26,12 +26,17 @@ user_pw = os.getenv('PASSWORD')
 acc_type = os.getenv('ACC_TYPE')
 
 def traderbt():
+    epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
     ig_service = usr.login_ig(IGService, username, user_pw, API_KEY, acc_type=acc_type)
     ig_service.create_session()
     positions = ig_service.fetch_open_positions()
-    if positions.empty:
+    p = positions.to_dict(orient='records')
+    for item in p:
+        if item['epic'] == epics[2]:
+            details = item
+            break
+    if details == None:
         # No trade is open, continue and check if ready to open a new trade
-        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
         df = price.load_ohlc(epics[2], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
         df = ind.calculate_macd(df, 5, 35, 5)
@@ -75,17 +80,15 @@ def traderbt():
             print('Buy condition:', buy_condition1, buy_condition2)
         time.sleep(30)
     else:
-        epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
         df = price.load_ohlc(epics[2], '5MINUTE')
         df = df.sort_values(by='date',ascending=True)
         window = df.iloc[len(df)-1:]
         #Check the stop level and update if it rises
         low = window['low'].min()-4
-        stopLevel = positions.iloc[-1]['stopLevel']
+        stopLevel = details['stopLevel']
         if low > stopLevel:
             # update the open position
-            response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=positions.iloc[-1]['dealId'])
-            print(response)
+            response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=details['dealId'])
             db = sqlite3.connect('streamed_prices.db')
             c = db.cursor()
             c.execute(''' 
@@ -95,9 +98,6 @@ def traderbt():
                         ''',(response['stopLevel'],  response['dealId']))
             db.commit()
             db.close()
-        else:
-            for i, row in window.iterrows():
-                print(row)
         time.sleep(60)
 while True:
     traderbt()
