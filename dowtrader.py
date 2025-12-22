@@ -114,7 +114,7 @@ def traderbt():
             #Check the stop level and update if it rises
             low = window['low'].min()-8
             stopLevel = details['stopLevel']
-            print(low, stopLevel)
+            print('BUY',low, stopLevel)
             if low > stopLevel:
                 # update the open position
                 response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=details['dealId'])
@@ -132,6 +132,7 @@ def traderbt():
             #Check the stop level and update if it rises
             high = window['high'].max()+8
             stopLevel = details['stopLevel']
+            print('SELL',high, stopLevel)
             if high < stopLevel:
                 # update the open position
                 response = ig_service.update_open_position(limit_level=None, stop_level=high, deal_id=details['dealId'])
