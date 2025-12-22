@@ -118,6 +118,7 @@ def traderbt():
             if low > stopLevel:
                 # update the open position
                 response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=details['dealId'])
+                # Check if it updates
                 print(response)
                 db = sqlite3.connect('streamed_prices.db')
                 c = db.cursor()
