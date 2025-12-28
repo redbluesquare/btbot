@@ -1,12 +1,12 @@
 [Unit]
-Description=Gold commodity trader
+Description=Epic trader
 After=network.target
 
 [Service]
 Type=simple
 User=pi
 WorkingDirectory=/opt/btbot
-ExecStart=/opt/btbot/.venv/bin/python goldtrader.py
+ExecStart=/opt/btbot/.venv/bin/python epictrader.py
 Restart=always
 RestartSec=10
 Environment="PYTHONUNBUFFERED=1"

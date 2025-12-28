@@ -56,39 +56,55 @@
         mode: '0644'
       loop: "{{ lookup('fileglob', '/opt/btbot/files/*.service.j2', wantlist=True) }}"
 
-    - name: Reload systemd daemon
-      systemd:
+    - name: Stop services if running 
+      ansible.builtin.systemd: 
+        name: "{{ item }}" 
+        state: stopped 
+      loop: 
+        - gold-trade.service 
+        - dow-trade.service 
+        - ftse-trade.service 
+    
+    - name: Disable services 
+      ansible.builtin.systemd: 
+        name: "{{ item }}" 
+        enabled: no 
+      loop: 
+        - gold-trade.service 
+        - dow-trade.service 
+        - ftse-trade.service 
+          
+    - name: Remove service files 
+      ansible.builtin.file: 
+        path: "/etc/systemd/system/{{ item }}" 
+        state: absent 
+      loop: 
+        - gold-trade.service 
+        - dow-trade.service 
+        - ftse-trade.service 
+    
+    - name: Reload systemd daemon 
+      ansible.builtin.systemd: 
         daemon_reload: yes
+    
+    - name: Enable services 
+      ansible.builtin.systemd: 
+        name: "{{ item }}" 
+        enabled: yes 
+      loop: 
+        - ohlc-stream.service 
+        - gh-ar.service 
+        - epic-trader.service 
 
-    - name: Restart ohlc-stream service
-      systemd:
-        name: ohlc-stream.service
+    - name: Restart services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
         state: restarted
         enabled: true
-
-    - name: Restart gold-trade service
-      systemd:
-        name: gold-trade.service
-        state: restarted
-        enabled: true
-        
-    - name: Restart gh-ar service
-      systemd:
-        name: gh-ar.service
-        state: restarted
-        enabled: true
-
-    - name: Restart dow-trade service
-      systemd:
-        name: dow-trade.service
-        state: restarted
-        enabled: true
-
-    - name: Restart ftse-trade service
-      systemd:
-        name: ftse-trade.service
-        state: restarted
-        enabled: true
+      loop:
+        - ohlc-stream.service 
+        - gh-ar.service 
+        - epic-trader.service
 
     - name: Ensure Raspberry Pi reboots daily at 11pm
       ansible.builtin.cron:
