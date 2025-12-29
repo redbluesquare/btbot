@@ -113,7 +113,7 @@ def traderbt():
                 db.close()
                 new_trade[index] = 30
         else:
-            df = price.load_ohlc(epics[1], '5MINUTE', records=5)
+            df = price.load_ohlc(epics[index], '5MINUTE', records=5)
             df = df.sort_values(by='date',ascending=True)
             if details['direction'] == 'BUY' and new_trade[index] <= 0:
                 window = df.iloc[-3:]
@@ -137,6 +137,7 @@ def traderbt():
                 #Check the stop level and update if it rises
                 high = window['high'].max()+buffer[index]
                 stopLevel = details['stopLevel']
+                print(details['epic'], high, stopLevel, len(window))
                 if high < stopLevel:
                     # update the open position
                     response = ig_service.update_open_position(limit_level=None, stop_level=high, deal_id=details['dealId'])
