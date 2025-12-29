@@ -113,7 +113,7 @@ def traderbt():
                 db.close()
                 new_trade[index] = 30
         else:
-            df = price.load_ohlc(epics[1], '5MINUTE')
+            df = price.load_ohlc(epics[1], '5MINUTE', records=5)
             df = df.sort_values(by='date',ascending=True)
             if details['direction'] == 'BUY' and new_trade[index] == 0:
                 window = df.iloc[len(df)-2:]
