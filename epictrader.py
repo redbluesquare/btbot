@@ -115,8 +115,8 @@ def traderbt():
         else:
             df = price.load_ohlc(epics[1], '5MINUTE', records=5)
             df = df.sort_values(by='date',ascending=True)
-            if details['direction'] == 'BUY' and new_trade[index] == 0:
-                window = df.iloc[len(df)-2:]
+            if details['direction'] == 'BUY' and new_trade[index] <= 0:
+                window = df.iloc[-3:]
                 #Check the stop level and update if it rises
                 low = window['low'].min()-buffer[index]
                 stopLevel = details['stopLevel']
@@ -132,8 +132,8 @@ def traderbt():
                                 ''',(response['stopLevel'],  response['dealId']))
                     db.commit()
                     db.close()
-            if details['direction'] == 'SELL':
-                window = df.iloc[len(df)-1:]
+            if details['direction'] == 'SELL' and new_trade[index] <= 0:
+                window = df.iloc[-2:]
                 #Check the stop level and update if it rises
                 high = window['high'].max()+buffer[index]
                 stopLevel = details['stopLevel']
