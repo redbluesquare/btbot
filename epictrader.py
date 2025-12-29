@@ -132,7 +132,7 @@ def traderbt():
                                 ''',(response['stopLevel'],  response['dealId']))
                     db.commit()
                     db.close()
-            if details['direction'] == 'SELL' and new_trade[index] == 0:
+            if details['direction'] == 'SELL':
                 window = df.iloc[len(df)-1:]
                 #Check the stop level and update if it rises
                 high = window['high'].max()+buffer[index]
