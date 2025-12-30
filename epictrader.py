@@ -120,6 +120,7 @@ def traderbt():
                 #Check the stop level and update if it rises
                 low = window['low'].min()-buffer[index]
                 stopLevel = details['stopLevel']
+                print(details['epic'], low, stopLevel, len(window))
                 if low > stopLevel:
                     # update the open position
                     response = ig_service.update_open_position(limit_level=None, stop_level=low, deal_id=details['dealId'])
@@ -151,7 +152,6 @@ def traderbt():
                     db.close()
         if new_trade[index] > 0:
             new_trade[index] = new_trade[index]-1
-    print('sleeping...')
     time.sleep(30)
     now = datetime.now().time()
     if dt_time(21, 2) <= now < dt_time(21, 3):
