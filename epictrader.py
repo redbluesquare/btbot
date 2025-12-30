@@ -35,6 +35,7 @@ def traderbt():
     buy_size = ['0.5', '0.1', '0.2']
     sell_size = ['0.25', '0.05', '0.1']
     trailing_stop = [1,2,2]
+    deal_window = [3,4,3]
     trading_hours = [
         {'open':5,'close':20},
         {'open':7,'close':20},
@@ -57,7 +58,7 @@ def traderbt():
             df = ind.calculate_cci(df, 90)
             df['buy_signal'] = False
             df['sell_signal'] = False
-            window = df.iloc[len(df)-4:]
+            window = df.iloc[-deal_window[index]:]
             buy_condition1 = window['bullish_crossover'].any() & window['rsi_cross_above_50'].any()
             buy_condition2 = window['bullish_crossover'].any() & window['rsi_bullish'].any()
             sell_condition = window['bearish_crossover'].any() & window['rsi_bearish'].any()
