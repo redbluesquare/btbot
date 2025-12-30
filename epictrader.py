@@ -34,6 +34,7 @@ def traderbt():
     buffer = [4,8,4]
     buy_size = ['0.5', '0.1', '0.2']
     sell_size = ['0.25', '0.05', '0.1']
+    trailing_stop = [1,2,2]
     trading_hours = [
         {'open':5,'close':20},
         {'open':7,'close':20},
@@ -116,7 +117,7 @@ def traderbt():
             df = price.load_ohlc(epics[index], '5MINUTE', records=5)
             df = df.sort_values(by='date',ascending=True)
             if details['direction'] == 'BUY' and new_trade[index] <= 0:
-                window = df.iloc[-3:]
+                window = df.iloc[-trailing_stop[index]:]
                 #Check the stop level and update if it rises
                 low = window['low'].min()-buffer[index]
                 stopLevel = details['stopLevel']
@@ -134,7 +135,7 @@ def traderbt():
                     db.commit()
                     db.close()
             if details['direction'] == 'SELL' and new_trade[index] <= 0:
-                window = df.iloc[-2:]
+                window = df.iloc[-trailing_stop[index]:]
                 #Check the stop level and update if it rises
                 high = window['high'].max()+buffer[index]
                 stopLevel = details['stopLevel']
