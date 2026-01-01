@@ -16,21 +16,42 @@ class Trades():
         self.acc_type = os.getenv('ACC_TYPE')
         pass
     
-    def prev_day_range(self, tz=timezone.utc):
+    def prev_day_range(self, tz=timezone.utc, days=10):
         now = datetime.now(tz)
-        prev = (now - timedelta(days=10)).replace(hour=0, minute=0, second=0, microsecond=0)
-        next_day = prev + timedelta(days=10)
+        prev = (now - timedelta(days=days)).replace(hour=0, minute=0, second=0, microsecond=0)
+        next_day = prev + timedelta(days=days)
         return prev, next_day
 
-    def getPreviousTrades(self):
+    def getPreviousTrades(self, days=10):
         ig_service = self.user.login_ig(IGService, self.username, self.user_pw, self.API_KEY, acc_type=self.acc_type)
         ig_service.create_session()
-        from_dt, to_dt = self.prev_day_range()
+        from_dt, to_dt = self.prev_day_range(days=days)
         activities = ig_service.fetch_transaction_history(from_date=str(from_dt)[:10], to_date=str(to_dt)[:10], page_size=999)
         return activities
-    
-    def get_trades(self, db, c, epic, limit=200):
+
+    def getTradeByOpenDatePrice(self, db, c, data):
         query = """SELECT epic, trade_date, trade_type, dealId, dealStatus, price, stake, macd, rsi, pnl 
+                    FROM trade_data 
+                    WHERE trade_date LIKE ? AND price = ? AND stake = ? AND pnl <> '0'
+                    ORDER BY trade_date DESC"""
+        for row in data.to_dict(orient='records'):
+            
+            c.execute(query, (row['openDateUtc']+'%', row['openLevel'], row['size'][1:]))
+            rows = c.fetchall()
+            if rows != []:
+                #Update the record
+                update_query = """
+                                    UPDATE trade_data
+                                    SET pnl = ?
+                                    WHERE trade_date LIKE ? AND price = ? AND stake = ?
+                                """
+                print((row['instrumentName'],row['openDateUtc']+'%', row['openLevel'], row['size'][1:]))
+                c.execute(update_query, (row['profitAndLoss'][1:],row['openDateUtc']+'%', row['openLevel'], row['size'][1:]))
+                db.commit()
+        return 'updates completed'
+
+    def get_trades(self, db, c, epic, limit=200):
+        query = """SELECT *
                     FROM trade_data 
                     WHERE epic = ?
                     ORDER BY trade_date DESC LIMIT ?"""

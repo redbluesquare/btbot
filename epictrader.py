@@ -6,8 +6,9 @@ import os
 import models.user as user
 import models.indicators as indicators
 import models.prices as prices
-import models.trade_executor as trade_executor
 import models.setup as setup
+import models.trade_executor as trade_executor
+import models.trades as trades
 from datetime import datetime, time as dt_time
 import app
 
@@ -156,9 +157,15 @@ def traderbt():
             new_trade[index] = new_trade[index]-1
     time.sleep(30)
     now = datetime.now().time()
-    if dt_time(21, 2) <= now < dt_time(21, 3):
+    if dt_time(14, 41) <= now < dt_time(14, 43):
         app.main()
-        time.sleep(60*2)
+        t = trades.Trades()
+        db = sqlite3.connect('streamed_prices.db')
+        c = db.cursor()
+        results = t.getPreviousTrades(days=120)
+        result = t.getTradeByOpenDatePrice(db, c, results)
+        db.close()
+        time.sleep(60*3)
 while True:
     traderbt()
     

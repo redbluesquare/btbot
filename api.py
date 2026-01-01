@@ -33,6 +33,18 @@ class Db_connect():
         if db is not None:
             db.close()
 
+class igTrades(Resource):
+    def delete(self):
+        pass
+
+    def get(self, days = 10):
+        db = Db_connect().get_db()
+        c = db.cursor()
+        t = trades.Trades()
+        results = t.getPreviousTrades(days=days)
+        result = t.getTradeByOpenDatePrice(db, c, results)
+        return result
+
 class TradePrices(Resource):
     def delete(self, epic):
         pass
@@ -63,6 +75,7 @@ class Trades(Resource):
 def index():
     return render_template("index.html")
 
+api.add_resource(igTrades, '/api/ig-trades/','/api/ig-trades/<int:days>')
 api.add_resource(TradePrices, '/api/prices/', '/api/prices/<string:epic>/<string:scale>')
 api.add_resource(Trades, '/api/trades/', '/api/trades/<string:epic>')
 
