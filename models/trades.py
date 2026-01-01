@@ -61,7 +61,57 @@ class Trades():
         df = pd.DataFrame(results)
         df["trade_date"] = pd.to_datetime(df["trade_date"])
         return df.sort_values(by="trade_date",ascending=False)
-    
+
+    def save_ig_trades_to_db(self, db, c, days:int=10):
+        response = self.getPreviousTrades(days=days)
+        for row in response.to_dict(orient='records'):
+            result = self.upsert_trade_history(db, c, row)
+            
+        
+    def upsert_trade_history(self, db, c, row):
+        sql = """
+        INSERT INTO trade_history (
+            reference, date, dateUtc, openDateUtc, instrumentName,
+            period, profitAndLoss, transactionType, openLevel,
+            closeLevel, size, currency, cashTransaction
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(reference) DO UPDATE SET
+            date = excluded.date,
+            dateUtc = excluded.dateUtc,
+            openDateUtc = excluded.openDateUtc,
+            instrumentName = excluded.instrumentName,
+            period = excluded.period,
+            profitAndLoss = excluded.profitAndLoss,
+            transactionType = excluded.transactionType,
+            openLevel = excluded.openLevel,
+            closeLevel = excluded.closeLevel,
+            size = excluded.size,
+            currency = excluded.currency,
+            cashTransaction = excluded.cashTransaction;
+        """
+        c.execute(sql, (
+            row["reference"],
+            row["date"],
+            row["dateUtc"],
+            row["openDateUtc"],
+            row["instrumentName"],
+            row["period"],
+            row["profitAndLoss"].replace("£", "").replace(",", ""),
+            row["transactionType"],
+            row["openLevel"].replace("£", "").replace(",", ""),
+            row["closeLevel"].replace("£", "").replace(",", ""),
+            row["size"].replace("£", "").replace(",", ""),
+            row["currency"],
+            row["cashTransaction"]
+        ))
+        db.commit()
+        return row
+
+            
+
+
+
 class Account():
     def __init__(self):
         self.user = user.User()

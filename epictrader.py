@@ -160,15 +160,15 @@ def traderbt():
     now = datetime.now().time()
     if dt_time(21, 1) <= now < dt_time(21, 3):
         app.main()
-    if dt_time(14, 52) <= now < dt_time(15, 23):
+        time.sleep(60*3)
+    if dt_time(16, 42) <= now < dt_time(16, 47):
         t = trades.Trades()
         db = sqlite3.connect('streamed_prices.db')
         c = db.cursor()
-        results = t.getPreviousTrades(days=120)
-        result = t.getTradeByOpenDatePrice(db, c, results)
-        print(result)
+        results = t.save_ig_trades_to_db(db, c, days=180)
         db.close()
-        time.sleep(60*3)
+        print('updated')
+        time.sleep(60*1)
 while True:
     traderbt()
     

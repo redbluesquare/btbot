@@ -19,6 +19,22 @@ def create_trades_table():
             PRIMARY KEY (epic, trade_date, trade_type))
     ''')
     db.commit()
+    c.execute(''' 
+        CREATE TABLE IF NOT EXISTS trade_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            reference TEXT UNIQUE,
+            date TEXT,
+            dateUtc TEXT,
+            openDateUtc TEXT,
+            instrumentName TEXT,
+            period TEXT,
+            profitAndLoss REAL,
+            transactionType TEXT,
+            openLevel REAL,
+            closeLevel REAL,
+            size REAL,
+            currency TEXT,
+            cashTransaction INTEGER)''')
     db.close()
 
 def update_trades_table():
