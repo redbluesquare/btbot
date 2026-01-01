@@ -157,13 +157,15 @@ def traderbt():
             new_trade[index] = new_trade[index]-1
     time.sleep(30)
     now = datetime.now().time()
-    if dt_time(14, 41) <= now < dt_time(14, 43):
+    if dt_time(21, 1) <= now < dt_time(21, 3):
         app.main()
+    if dt_time(14, 52) <= now < dt_time(15, 23):
         t = trades.Trades()
         db = sqlite3.connect('streamed_prices.db')
         c = db.cursor()
         results = t.getPreviousTrades(days=120)
         result = t.getTradeByOpenDatePrice(db, c, results)
+        print(result)
         db.close()
         time.sleep(60*3)
 while True:
