@@ -21,6 +21,24 @@ def create_trades_table():
     db.commit()
     db.close()
 
+def update_trades_table():
+    db = sqlite3.connect('streamed_prices.db')
+    c = db.cursor()
+    columns_to_add = [ 
+        ("open_level", "REAL")
+        , ("close_level", "REAL")
+        , ("currency", "TEXT")
+        , ("reference", "TEXT")
+        , ("instrument_name", "TEXT") ] 
+    for col, col_type in columns_to_add:
+        try: 
+            c.execute(f"ALTER TABLE trade_data ADD COLUMN {col} {col_type}") 
+        except sqlite3.OperationalError: 
+            # Column already exists — ignore 
+            pass
+    db.commit()
+    db.close()
+
 def create_trading_check_table():
     db = sqlite3.connect('streamed_prices.db')
     c = db.cursor()

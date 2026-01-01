@@ -19,7 +19,8 @@ ind = indicators.Indicators()
 
 te = trade_executor.TradeExecutor()
 setup.create_trades_table()
-setup.create_trading_check_table
+setup.create_trading_check_table()
+setup.update_trades_table()
 
 API_KEY = os.getenv('API_KEY')
 username = os.getenv('IDENTIFIER')
