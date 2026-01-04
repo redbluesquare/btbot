@@ -35,7 +35,6 @@ class Trades():
                     WHERE trade_date LIKE ? AND price = ? AND stake = ? AND pnl <> '0'
                     ORDER BY trade_date DESC"""
         for row in data.to_dict(orient='records'):
-            
             c.execute(query, (row['openDateUtc']+'%', row['openLevel'], row['size'][1:]))
             rows = c.fetchall()
             if rows != []:
@@ -66,8 +65,7 @@ class Trades():
         response = self.getPreviousTrades(days=days)
         for row in response.to_dict(orient='records'):
             result = self.upsert_trade_history(db, c, row)
-            
-        
+
     def upsert_trade_history(self, db, c, row):
         sql = """
         INSERT INTO trade_history (
@@ -107,10 +105,6 @@ class Trades():
         ))
         db.commit()
         return row
-
-            
-
-
 
 class Account():
     def __init__(self):

@@ -34,14 +34,19 @@ def traderbt():
     
     epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
     buffer = [4,8,4]
-    buy_size = ['0.5', '0.1', '0.2']
+    buy_size = ['1', '0.15', '0.5']
     sell_size = ['0.25', '0.05', '0.1']
     trailing_stop = [1,2,2]
     deal_window = [3,4,3]
     trading_hours = [
-        {'open':5,'close':20},
-        {'open':7,'close':20},
-        {'open':6,'close':19},
+        {'open':2,'close':8},
+        {'open':6,'close':7},
+        {'open':7,'close':11},
+    ]
+    trading_hours2 = [
+        {'open':12,'close':14},
+        {'open':10,'close':18},
+        {'open':7,'close':11},
     ]
     new_trade = [0,0,0]
     for index, epic in enumerate(epics):
@@ -64,7 +69,7 @@ def traderbt():
             buy_condition1 = window['bullish_crossover'].any() & window['rsi_cross_above_50'].any()
             buy_condition2 = window['bullish_crossover'].any() & window['rsi_bullish'].any()
             sell_condition = window['bearish_crossover'].any() & window['rsi_bearish'].any()
-            if (buy_condition1 or buy_condition2 or window['cci_bullish_crossover'].any()) and ind.is_within_trading_hours(window.iloc[-1]['date'], trading_hours[index]['open'], trading_hours[index]['close']):
+            if (buy_condition1 or buy_condition2 or window['cci_bullish_crossover'].any()) and (ind.is_within_trading_hours(window.iloc[-1]['date'], trading_hours[index]['open'], trading_hours[index]['close']) or ind.is_within_trading_hours(window.iloc[-1]['date'], trading_hours2[index]['open'], trading_hours2[index]['close'])):
                 buy_index = window.index[-1]
                 df.at[buy_index, 'buy_signal'] = True
                 # create an order
@@ -161,11 +166,11 @@ def traderbt():
     if dt_time(21, 1) <= now < dt_time(21, 3):
         app.main()
         time.sleep(60*3)
-    if dt_time(16, 42) <= now < dt_time(16, 47):
+    if dt_time(21, 12) <= now < dt_time(16, 14):
         t = trades.Trades()
         db = sqlite3.connect('streamed_prices.db')
         c = db.cursor()
-        results = t.save_ig_trades_to_db(db, c, days=180)
+        results = t.save_ig_trades_to_db(db, c, days=3)
         db.close()
         print('updated')
         time.sleep(60*1)
