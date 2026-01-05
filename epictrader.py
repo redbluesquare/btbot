@@ -56,7 +56,7 @@ def traderbt():
             if item['epic'] == epic:
                 details = item
                 break
-        if details == None:
+        if details == None and new_trade[index] <= 0:
             # No trade is open, continue and check if ready to open a new trade
             df = price.load_ohlc(epic, '5MINUTE')
             df = df.sort_values(by='date',ascending=True)
