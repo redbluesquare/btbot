@@ -27,11 +27,12 @@ username = os.getenv('IDENTIFIER')
 user_pw = os.getenv('PASSWORD')
 acc_type = os.getenv('ACC_TYPE')
 
+new_trade = [0,0,0]
+
 def traderbt():
     ig_service = usr.login_ig(IGService, username, user_pw, API_KEY, acc_type=acc_type)
     ig_service.create_session()
     positions = ig_service.fetch_open_positions()
-    
     epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
     buffer = [4,8,4]
     buy_size = ['1', '0.15', '0.5']
@@ -48,7 +49,7 @@ def traderbt():
         {'open':10,'close':18},
         {'open':7,'close':11},
     ]
-    new_trade = [0,0,0]
+    
     for index, epic in enumerate(epics):
         p = positions.to_dict(orient='records')
         details = None
