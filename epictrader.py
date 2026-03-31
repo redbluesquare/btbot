@@ -38,14 +38,14 @@ def traderbt():
     buy_size = ['0.50', '0.05', '0.25']
     sell_size = ['0.25', '0.05', '0.1']
     trailing_stop = [1,2,2]
-    deal_window = [3,4,3]
+    deal_window = [3,3,3]
     trading_hours = [
         {'open':2,'close':8},
         {'open':2,'close':7},
         {'open':7,'close':11},
     ]
     trading_hours2 = [
-        {'open':12,'close':16},
+        {'open':11,'close':16},
         {'open':9,'close':18},
         {'open':13,'close':17},
     ]
