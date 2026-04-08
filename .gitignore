@@ -3,3 +3,4 @@
 media/output/*
 *.db
 */__pycache__
+build/*

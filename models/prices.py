@@ -16,11 +16,11 @@ class Prices():
     def get_ohlc(self, db, c, epic, scale='1MINUTE', records=100):
         ind = indicators.Indicators()
         query = """
-            SELECT epic, date, (bid_open+offer_open)/2 open
-            ,(bid_high+offer_high)/2 high
-            ,(bid_low+offer_low)/2 low
-            ,(bid_close+offer_close)/2 close
-            FROM ohlc_data
+            SELECT epic, date, open
+            ,high
+            ,low
+            ,close
+            FROM price_data
             WHERE epic = ? AND scale = ?
             ORDER BY date DESC LIMIT ?
         """
@@ -41,18 +41,18 @@ class Prices():
         df = df.sort_values(by='date',ascending=False)
         return df
     
-    def load_ohlc(self, epic, scale='1MINUTE', db_path="streamed_prices.db", records=100):
+    def load_ohlc(self, epic, scale='1MINUTE', db_path="btbot.db", records=100):
         """
         Load OHLC data for a given epic and timeframe from SQLite.
         Returns a pandas DataFrame indexed by datetime.
         """
         conn = sqlite3.connect(db_path)
         query = """
-            SELECT epic, date, (bid_open+offer_open)/2 open
-            ,(bid_high+offer_high)/2 high
-            ,(bid_low+offer_low)/2 low
-            ,(bid_close+offer_close)/2 close
-            FROM ohlc_data
+            SELECT epic, date, open
+            ,high
+            ,low
+            ,close
+            FROM price_data
             WHERE epic = ? AND scale = ?
             ORDER BY date DESC LIMIT ?
         """

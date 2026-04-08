@@ -1,0 +1,15 @@
+[Unit]
+Description=OHLC Lightstreamer Data Collector
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/btbot
+ExecStart=/opt/btbot/.venv/bin/python btbot.py
+Restart=always
+RestartSec=10
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target

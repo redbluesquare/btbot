@@ -162,6 +162,7 @@ def traderbt():
                     db.close()
         if new_trade[index] > 0:
             new_trade[index] = new_trade[index]-1
+        #print(df)
     time.sleep(30)
     now = datetime.now().time()
     if dt_time(21, 1) <= now < dt_time(21, 3):
