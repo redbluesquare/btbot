@@ -1,0 +1,101 @@
+---
+- name: Raspberry Pi 4 Power Optimisation
+  hosts: raspberrypi
+  become: yes
+  gather_facts: yes
+
+  vars:
+    disable_hdmi: true
+    disable_leds: true
+    cpu_governor: "powersave"
+    wifi_powersave: true
+
+  tasks:
+
+    - name: Ensure required packages are installed
+      apt:
+        name:
+          - raspi-config
+          - wireless-tools
+        state: present
+        update_cache: yes
+
+    # -----------------------------
+    # CPU GOVERNOR
+    # -----------------------------
+    - name: Set CPU governor
+      copy:
+        dest: /etc/default/cpufrequtils
+        content: |
+          GOVERNOR="{{ cpu_governor }}"
+      notify: restart_cpufreq
+
+    # -----------------------------
+    # WIFI POWER SAVE
+    # -----------------------------
+    - name: Enable WiFi power saving
+      when: wifi_powersave
+      copy:
+        dest: /etc/NetworkManager/conf.d/wifi-powersave.conf
+        content: |
+          [connection]
+          wifi.powersave = 3
+
+    # -----------------------------
+    # DISABLE HDMI
+    # -----------------------------
+    - name: Disable HDMI output
+      when: disable_hdmi
+      lineinfile:
+        path: /boot/config.txt
+        regexp: "^hdmi_blanking="
+        line: "hdmi_blanking=2"
+
+    - name: Add HDMI disable command to rc.local
+      when: disable_hdmi
+      lineinfile:
+        path: /etc/rc.local
+        insertafter: "^#!/bin/sh -e"
+        line: "/usr/bin/tvservice -o || true"
+        state: present
+
+    # -----------------------------
+    # DISABLE LEDs
+    # -----------------------------
+    - name: Disable activity LEDs
+      when: disable_leds
+      blockinfile:
+        path: /boot/config.txt
+        block: |
+          # Disable LEDs
+          dtparam=act_led_trigger=none
+          dtparam=act_led_activelow=on
+          dtparam=pwr_led_trigger=none
+          dtparam=pwr_led_activelow=on
+
+    # -----------------------------
+    # DISABLE UNUSED SERVICES
+    # -----------------------------
+    - name: Disable Bluetooth (optional)
+      systemd:
+        name: bluetooth
+        enabled: no
+        state: stopped
+
+    - name: Disable Avahi (mDNS)
+      systemd:
+        name: avahi-daemon
+        enabled: no
+        state: stopped
+
+    - name: Disable triggerhappy (keyboard hotkeys)
+      systemd:
+        name: triggerhappy
+        enabled: no
+        state: stopped
+
+  handlers:
+    - name: restart_cpufreq
+      service:
+        name: cpufrequtils
+        state: restarted

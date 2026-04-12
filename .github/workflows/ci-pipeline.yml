@@ -36,6 +36,7 @@ jobs:
       - name: Run Ansible playbook
         run: |
           ansible-playbook ansible/playbook.yaml --connection=local --inventory 127.0.0.1,
+          ansible-playbook ansible/raspberrypi_opt.yaml --connection=local --inventory 127.0.0.1,
 #      - name: Copy the env file
 #        run: |
 #          sudo cp /home/pi/.env.j2 /opt/btbot/.env
