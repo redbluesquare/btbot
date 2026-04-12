@@ -51,13 +51,13 @@
         regexp: "^hdmi_blanking="
         line: "hdmi_blanking=2"
 
-    - name: Add HDMI disable command to rc.local
-      when: disable_hdmi
-      lineinfile:
-        path: /etc/rc.local
-        insertafter: "^#!/bin/sh -e"
-        line: "/usr/bin/tvservice -o || true"
-        state: present
+    #- name: Add HDMI disable command to rc.local
+    #  when: disable_hdmi
+    #  lineinfile:
+    #    path: /etc/rc.local
+    #    insertafter: "^#!/bin/sh -e"
+    #    line: "/usr/bin/tvservice -o || true"
+    #    state: present
 
     # -----------------------------
     # DISABLE LEDs
