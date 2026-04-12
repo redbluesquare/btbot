@@ -33,11 +33,12 @@ def traderbt():
     ig_service = usr.login_ig(IGService, username, user_pw, API_KEY, acc_type=acc_type)
     ig_service.create_session()
     positions = ig_service.fetch_open_positions()
-    epics = ['CS.D.USCGC.TODAY.IP','IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP']
-    buffer = [4,8,4]
-    buy_size = ['0.50', '0.05', '0.25']
-    sell_size = ['0.25', '0.05', '0.1']
-    trailing_stop = [1,2,2]
+    epics = ['IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP','CS.D.USCGC.TODAY.IP']
+    buffer = [8,4,4]
+    buy_size = ['0.05', '0.25', '0.50']
+    sell_size = ['0.05', '0.1', '0.25']
+    max_stop = ['60', '20', '10']
+    trailing_stop = [2,2,1]
     deal_window = [3,3,3]
     trading_hours = [
         {'open':2,'close':8},
@@ -83,6 +84,8 @@ def traderbt():
                 guaranteed_stop=False
                 force_open=True
                 stop_distance=window.iloc[-1]['close']-window['low'].min()+buffer[index]
+                if stop_distance > max_stop[index]:
+                    stop_distance = max_stop[index]
                 trade = te.open_trade(ig_service, epic, expiry=expiry, direction=direction, size=size,order_type=order_type,currency_code=currency_code
                             ,guaranteed_stop=guaranteed_stop, force_open=force_open, stop_distance=stop_distance)
                 db = sqlite3.connect('streamed_prices.db')
@@ -109,6 +112,8 @@ def traderbt():
                 guaranteed_stop=False
                 force_open=True
                 stop_distance=window['high'].max()-window.iloc[-1]['close']+buffer[index]
+                if stop_distance > max_stop[index]:
+                    stop_distance = max_stop[index]
                 trade = te.open_trade(ig_service, epic, expiry=expiry, direction=direction, size=size,order_type=order_type,currency_code=currency_code
                             ,guaranteed_stop=guaranteed_stop, force_open=force_open, stop_distance=stop_distance)
                 db = sqlite3.connect('streamed_prices.db')
@@ -162,7 +167,6 @@ def traderbt():
                     db.close()
         if new_trade[index] > 0:
             new_trade[index] = new_trade[index]-1
-        #print(df)
     time.sleep(30)
     now = datetime.now().time()
     if dt_time(21, 1) <= now < dt_time(21, 3):
