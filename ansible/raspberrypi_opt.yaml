@@ -1,6 +1,6 @@
 ---
 - name: Raspberry Pi 4 Power Optimisation
-  hosts: raspberrypi
+  hosts: localhost
   become: yes
   gather_facts: yes
 
