@@ -37,7 +37,7 @@ def traderbt():
     buffer = [8,4,4]
     buy_size = ['0.05', '0.25', '0.50']
     sell_size = ['0.05', '0.1', '0.25']
-    max_stop = ['60', '20', '10']
+    max_stop = [60, 20, 10]
     trailing_stop = [2,2,1]
     deal_window = [3,3,3]
     trading_hours = [
@@ -167,6 +167,8 @@ def traderbt():
                     db.close()
         if new_trade[index] > 0:
             new_trade[index] = new_trade[index]-1
+        print(df)
+        time.sleep(1)
     time.sleep(30)
     now = datetime.now().time()
     if dt_time(21, 1) <= now < dt_time(21, 3):
