@@ -50,16 +50,14 @@ class Trades():
         return 'updates completed'
 
     def get_trades(self, db, c, epic, limit=200):
-        query = """SELECT *
+        query = """SELECT epic, datetime(trade_date), stake, pnl, datetime('now')
+                        ,CAST((JULIANDAY('now')-JULIANDAY(trade_date))*24*60 AS Int)
                     FROM trade_data 
                     WHERE epic = ?
                     ORDER BY trade_date DESC LIMIT ?"""
         c.execute(query, (epic, limit,))
         rows = c.fetchall()
-        results = [dict(row) for row in rows]
-        df = pd.DataFrame(results)
-        df["trade_date"] = pd.to_datetime(df["trade_date"])
-        return df.sort_values(by="trade_date",ascending=False)
+        return rows
 
     def save_ig_trades_to_db(self, db, c, days:int=10):
         response = self.getPreviousTrades(days=days)

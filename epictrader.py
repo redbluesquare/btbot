@@ -9,13 +9,14 @@ import models.prices as prices
 import models.setup as setup
 import models.trade_executor as trade_executor
 import models.trades as trades
-from datetime import datetime, time as dt_time
+from datetime import datetime, timezone, time as dt_time
 import app
 
 load_dotenv()  # take environment variables
 usr = user.User()
 price = prices.Prices()
 ind = indicators.Indicators()
+trdes = trades.Trades()
 
 te = trade_executor.TradeExecutor()
 setup.create_trades_table()
@@ -58,7 +59,11 @@ def traderbt():
             if item['epic'] == epic:
                 details = item
                 break
-        if details == None and new_trade[index] <= 0:
+        # Get the last trade and datetime
+        db = sqlite3.connect('streamed_prices.db')
+        c = db.cursor()
+        last_trade = trdes.get_trades(db, c, epic, limit=1)
+        if details == None and int(last_trade[0][5]) > deal_window[index]*6:
             # No trade is open, continue and check if ready to open a new trade
             df = price.load_ohlc(epic, '5MINUTE')
             df = df.sort_values(by='date',ascending=True)
@@ -167,18 +172,15 @@ def traderbt():
                     db.close()
         if new_trade[index] > 0:
             new_trade[index] = new_trade[index]-1
-        print(df)
-        time.sleep(1)
     time.sleep(30)
     now = datetime.now().time()
     if dt_time(21, 1) <= now < dt_time(21, 3):
         app.main()
         time.sleep(60*3)
     if dt_time(21, 12) <= now < dt_time(16, 14):
-        t = trades.Trades()
         db = sqlite3.connect('streamed_prices.db')
         c = db.cursor()
-        results = t.save_ig_trades_to_db(db, c, days=3)
+        results = trdes.save_ig_trades_to_db(db, c, days=3)
         db.close()
         print('updated')
         time.sleep(60*1)
