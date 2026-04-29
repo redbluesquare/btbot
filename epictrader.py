@@ -36,8 +36,8 @@ def traderbt():
     positions = ig_service.fetch_open_positions()
     epics = ['IX.D.DOW.DAILY.IP','IX.D.FTSE.DAILY.IP','CS.D.USCGC.TODAY.IP']
     buffer = [8,4,4]
-    buy_size = ['0.05', '0.25', '0.50']
-    sell_size = ['0.05', '0.1', '0.25']
+    buy_size = ['0.01', '0.05', '0.05']
+    sell_size = ['0.01', '0.05', '0.05']
     max_stop = [60, 20, 10]
     trailing_stop = [2,2,1]
     deal_window = [3,3,3]
