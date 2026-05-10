@@ -39,6 +39,14 @@ class Indicators():
         df['bc'] = np.where(df['bullish_crossover'], df['macd'], np.nan)
         return df
 
+    def add_atr(self, df, period=14):
+        high_low = df['high'] - df['low']
+        high_close = (df['high'] - df['close'].shift()).abs()
+        low_close = (df['low'] - df['close'].shift()).abs()
+        tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+        df['atr'] = tr.rolling(period).mean()
+        return df
+
     def calculate_rsi(self, df, period=21):
         close = df['close']
         delta = close.diff()
