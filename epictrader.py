@@ -165,7 +165,6 @@ def traderbt():
             df_recent = ind.add_atr(df_recent, 14)
             last_r = df_recent.iloc[-1]
             atr = last_r['atr']
-            print(df_recent)
 
             entry = open_pos['level']
             stop = open_pos['stopLevel']
@@ -173,7 +172,7 @@ def traderbt():
 
             if open_pos['direction'] == 'BUY':
                 r = (current - entry) / (entry - stop) if entry != stop else 0
-
+                print(open_pos, r)
                 if r >= 1.0 and stop < entry:
                     new_stop = entry
                 elif r >= 2.0:
@@ -185,10 +184,11 @@ def traderbt():
                     response = ig_service.update_open_position(
                         limit_level=None, stop_level=new_stop, deal_id=open_pos['dealId']
                     )
+                    print(response)
 
             if open_pos['direction'] == 'SELL':
                 r = (entry - current) / (stop - entry) if entry != stop else 0
-
+                print(open_pos, r)
                 if r >= 1.0 and stop > entry:
                     new_stop = entry
                 elif r >= 2.0:
@@ -200,6 +200,7 @@ def traderbt():
                     response = ig_service.update_open_position(
                         limit_level=None, stop_level=new_stop, deal_id=open_pos['dealId']
                     )
+                    print(response)
 
     time.sleep(30)
 
