@@ -176,7 +176,6 @@ def traderbt():
                 # If risk is zero or tiny, rebuild it using ATR
                 if risk < 1e-6:
                     risk = 2.0 * atr
-
                 r = (current - entry) / risk
                 print(open_pos['epic'], entry, current, stop, r)
                 if r >= 1.0 and stop < entry:
@@ -193,7 +192,12 @@ def traderbt():
                     print(response)
 
             if open_pos['direction'] == 'SELL':
-                r = (entry - current) / (stop - entry) if entry != stop else 0
+                #r = (entry - current) / (stop - entry) if entry != stop else 0
+                risk = abs(entry - stop)
+                # If risk is zero or tiny, rebuild it using ATR
+                if risk < 1e-6:
+                    risk = 2.0 * atr
+                r = (current - entry) / risk
                 print(open_pos['epic'], entry, current, stop, r)
                 if r >= 1.0 and stop > entry:
                     new_stop = entry
