@@ -57,7 +57,7 @@ def traderbt():
     epics = ['IX.D.DOW.DAILY.IP', 'IX.D.FTSE.DAILY.IP', 'CS.D.USCGC.TODAY.IP']
     buy_size = ['0.01', '0.05', '0.05']
     sell_size = ['0.01', '0.05', '0.05']
-    max_stop = [60, 20, 10]
+    max_stop = [30, 15, 10]
 
     trading_hours = [
         {'open': 2, 'close': 19},
@@ -165,6 +165,7 @@ def traderbt():
             df_recent = ind.add_atr(df_recent, 14)
             last_r = df_recent.iloc[-1]
             atr = last_r['atr']
+            print(df_recent)
 
             entry = open_pos['level']
             stop = open_pos['stopLevel']
