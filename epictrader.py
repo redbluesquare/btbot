@@ -162,7 +162,7 @@ def traderbt():
         else:
             df_recent = price.load_ohlc(epic, '5MINUTE', records=10)
             df_recent = df_recent.sort_values(by='date', ascending=True)
-            df_recent = add_atr(df_recent, 14)
+            df_recent = ind.add_atr(df_recent, 14)
             last_r = df_recent.iloc[-1]
             atr = last_r['atr']
 
