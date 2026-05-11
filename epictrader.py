@@ -172,7 +172,7 @@ def traderbt():
 
             if open_pos['direction'] == 'BUY':
                 r = (current - entry) / (entry - stop) if entry != stop else 0
-                print(open_pos, r)
+                print(open_pos['epic'], entry, current, stop, r)
                 if r >= 1.0 and stop < entry:
                     new_stop = entry
                 elif r >= 2.0:
@@ -188,7 +188,7 @@ def traderbt():
 
             if open_pos['direction'] == 'SELL':
                 r = (entry - current) / (stop - entry) if entry != stop else 0
-                print(open_pos, r)
+                print(open_pos['epic'], entry, current, stop, r)
                 if r >= 1.0 and stop > entry:
                     new_stop = entry
                 elif r >= 2.0:
