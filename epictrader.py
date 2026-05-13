@@ -177,9 +177,9 @@ def traderbt():
                 if risk < 1e-6:
                     risk = 2.0 * atr
                 r = (current - entry) / risk
-                print(open_pos['epic'], entry, current, stop, r)
+
                 if r >= 1.0 and stop < entry:
-                    new_stop = entry
+                    new_stop = entry*1.0001
                 elif r >= 2.0:
                     new_stop = current - 1.5 * atr
                 else:
@@ -189,7 +189,6 @@ def traderbt():
                     response = ig_service.update_open_position(
                         limit_level=None, stop_level=new_stop, deal_id=open_pos['dealId']
                     )
-                    print(response)
 
             if open_pos['direction'] == 'SELL':
                 #r = (entry - current) / (stop - entry) if entry != stop else 0
@@ -210,7 +209,6 @@ def traderbt():
                     response = ig_service.update_open_position(
                         limit_level=None, stop_level=new_stop, deal_id=open_pos['dealId']
                     )
-                    print(response)
 
     time.sleep(30)
 
