@@ -60,9 +60,9 @@ def traderbt():
     max_stop = [30, 15, 10]
 
     trading_hours = [
-        {'open': 2, 'close': 19},
-        {'open': 2, 'close': 19},
-        {'open': 2, 'close': 19},
+        {'open': 1, 'close': 21},
+        {'open': 1, 'close': 21},
+        {'open': 1, 'close': 21},
     ]
 
     for index, epic in enumerate(epics):
