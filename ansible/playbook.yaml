@@ -7,16 +7,6 @@
     target_dir: "/opt/btbot"
 
   tasks:
-    - name: Stop epictrader-service
-      ansible.builtin.systemd:
-        name: epictrader-service
-        state: stopped
-    
-    - name: Disable epictrader-service
-      ansible.builtin.systemd:
-        name: epictrader-service
-        enabled: no
-    
     - name: Ensure target directory exists
       file:
         path: "{{ target_dir }}"
@@ -57,6 +47,16 @@
     - name: Copy the .env temlplate file
       command: "cp /home/pi/.env.j2 /opt/btbot/.env"
 
+    - name: Stop epictrader.service
+      ansible.builtin.systemd:
+        name: epictrader.service
+        state: stopped
+    
+    - name: Disable epictrader.service
+      ansible.builtin.systemd:
+        name: epictrader.service
+        enabled: no
+    
     - name: Render and deploy systemd unit templates
       template:
         src: "{{ item }}"
