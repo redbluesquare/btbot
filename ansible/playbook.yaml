@@ -47,14 +47,14 @@
     - name: Copy the .env temlplate file
       command: "cp /home/pi/.env.j2 /opt/btbot/.env"
 
-    - name: Stop epictrader.service
+    - name: Stop epic-trader.service
       ansible.builtin.systemd:
-        name: epictrader.service
+        name: epic-trader.service
         state: stopped
     
-    - name: Disable epictrader.service
+    - name: Disable epic-trader.service
       ansible.builtin.systemd:
-        name: epictrader.service
+        name: epic-trader.service
         enabled: no
     
     - name: Render and deploy systemd unit templates
