@@ -7,6 +7,16 @@
     target_dir: "/opt/btbot"
 
   tasks:
+    - name: Stop epictrader-service
+      ansible.builtin.systemd:
+        name: epictrader-service
+        state: stopped
+    
+    - name: Disable epictrader-service
+      ansible.builtin.systemd:
+        name: epictrader-service
+        enabled: no
+    
     - name: Ensure target directory exists
       file:
         path: "{{ target_dir }}"
@@ -67,7 +77,9 @@
       loop: 
         - ohlc-stream.service 
         - gh-ar.service 
-        - epic-trader.service 
+        - dow-trader.service 
+        - ftse-trader.service 
+        - uscgc-trader.service 
 
     - name: Restart services
       ansible.builtin.systemd:
@@ -78,7 +90,9 @@
         - ohlc-stream.service 
         - btbot.service 
         - gh-ar.service 
-        - epic-trader.service
+        - dow-trader.service 
+        - ftse-trader.service 
+        - uscgc-trader.service 
 
     - name: Ensure Raspberry Pi reboots daily at 11pm
       ansible.builtin.cron:
