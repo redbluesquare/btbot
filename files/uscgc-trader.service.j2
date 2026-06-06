@@ -1,0 +1,15 @@
+[Unit]
+Description=GOLD trader
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/btbot
+ExecStart=/opt/btbot/.venv/bin/python uscgc_trader.py
+Restart=always
+RestartSec=10
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
