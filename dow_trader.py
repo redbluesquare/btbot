@@ -34,13 +34,13 @@ user_pw = os.getenv('PASSWORD')
 acc_type = os.getenv('ACC_TYPE')
 
 # FTSE-specific configuration
-EPIC = 'IX.D.FTSE.DAILY.IP'
-BUY_SIZE = '0.05'
-SELL_SIZE = '0.05'
-MAX_STOP = 15
+EPIC = 'IX.D.DOW.DAILY.IP'
+BUY_SIZE = '0.01'
+SELL_SIZE = '0.01'
+MAX_STOP = 40
 COOLDOWN_MINUTES = 30
-TRADING_OPEN = 1
-TRADING_CLOSE = 21
+TRADING_OPEN = 13
+TRADING_CLOSE = 18
 
 
 # ---------------------------------------------------------
@@ -72,7 +72,7 @@ def last_trade_time(epic):
 # Main Trading Logic
 # ---------------------------------------------------------
 
-def trade_ftse():
+def trade_epic():
     ig_service = usr.login_ig(IGService, username, user_pw, API_KEY, acc_type=acc_type)
     ig_service.create_session()
 
@@ -88,10 +88,11 @@ def trade_ftse():
     # Load indicators
     df = price.load_ohlc(EPIC, '5MINUTE')
     df = df.sort_values(by='date')
-    df = ind.calculate_macd(df, 5, 35, 5)
+    df = ind.calculate_macd(df, 8, 21, 5)
     df = ind.calculate_rsi(df, 21)
     df = ind.calculate_cci(df, 90)
-    df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
+    df['macd_slope'] = df['macd'].diff()
+    df['ema20'] = df['close'].ewm(span=20, adjust=False).mean()
     df = ind.add_atr(df, 14)
 
     last = df.iloc[-1]
@@ -101,19 +102,24 @@ def trade_ftse():
         last['date'], TRADING_OPEN, TRADING_CLOSE
     )
 
+    candle_range = last['high'] - last['low']
+    if candle_range < 1.2 * last['atr']:
+        return  # only trade strong momentum candles
+
+
     # Signals
     buy_signal = (
         last['bullish_crossover'] and
-        (last['rsi_cross_above_50'] or last['rsi_bullish']) and
-        last['close'] > last['ema50'] and
-        last['rsi'] < 65
+        last['macd_slope'] > 0 and
+        last['close'] > last['ema20'] and
+        last['rsi'] > 60
     )
 
     sell_signal = (
         last['bearish_crossover'] and
-        last['rsi_bearish'] and
-        last['close'] < last['ema50'] and
-        last['rsi'] > 35
+        last['macd_slope'] < 0 and
+        last['close'] < last['ema20'] and
+        last['rsi'] < 40
     )
 
     # ---------------------------------------------------------
@@ -126,7 +132,7 @@ def trade_ftse():
 
             if in_hours and buy_signal:
                 atr = last['atr']
-                stop_distance = min(MAX_STOP, 2.0 * atr)
+                stop_distance = min(MAX_STOP, 4.0 * atr)
 
                 trade = te.open_trade(
                     ig_service, EPIC, expiry='DFB', direction='BUY',
@@ -188,6 +194,13 @@ def trade_ftse():
         entry = open_pos['level']
         stop = open_pos['stopLevel']
         current = last_r['close']
+
+        bars = len(df_recent)
+        if bars > 20:
+            if open_pos['direction'] == 'BUY' and stop < entry:
+                new_stop = entry
+            elif open_pos['direction'] == 'SELL' and stop > entry:
+                new_stop = entry
 
         # BUY POSITION MANAGEMENT
         if open_pos['direction'] == 'BUY':
@@ -252,5 +265,5 @@ def trade_ftse():
 
 if __name__ == "__main__":
     while True:
-        trade_ftse()
+        trade_epic()
         time.sleep(30)
