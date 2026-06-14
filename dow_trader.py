@@ -325,7 +325,7 @@ def trade_epic():
         #app.main()
         time.sleep(180)
 
-    if dt_time(22, 56) <= now < dt_time(22, 58):
+    if dt_time(23, 11) <= now < dt_time(23, 13):
         logger.info("Saving IG trades to DB.")
         db = sqlite3.connect("streamed_prices.db")
         c = db.cursor()
