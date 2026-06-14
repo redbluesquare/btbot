@@ -76,6 +76,7 @@
         enabled: yes 
       loop: 
         - ohlc-stream.service 
+        - btbot.service 
         - gh-ar.service 
         - dow-trader.service 
         - ftse-trader.service 

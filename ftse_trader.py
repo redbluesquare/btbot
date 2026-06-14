@@ -292,13 +292,18 @@ def process_epic(ig_service, positions):
     if open_pos["direction"] == "BUY":
         r = (current - entry) / risk
 
-        # Time-based stop: break-even after 30 bars
-        if bars_since_entry >= 30 and stop < entry <= current:
+        # Break-even after 15 bars (not 30)
+        if bars_since_entry >= 15 and stop < entry:
             new_stop = entry
-        elif r >= 1.0 and stop < entry:
-            new_stop = entry * 1.0001
-        elif r >= 2.0:
-            new_stop = current - 1.5 * atr
+
+        # Move stop to BE at R >= 0.5 (FTSE rarely hits R=1 early)
+        elif r >= 0.5 and stop < entry:
+            new_stop = entry
+
+        # Trail at R >= 1.5
+        elif r >= 1.5:
+            new_stop = current - 1.0 * atr
+
         else:
             new_stop = stop
 
@@ -316,13 +321,18 @@ def process_epic(ig_service, positions):
     elif open_pos["direction"] == "SELL":
         r = (entry - current) / risk
 
-        # Time-based stop: break-even after 30 bars
-        if bars_since_entry >= 30 and stop > entry >= current:
+        # Break-even after 15 bars
+        if bars_since_entry >= 15 and stop > entry:
             new_stop = entry
-        elif r >= 1.0 and stop > entry:
+
+        # Move stop to BE at R >= 0.5
+        elif r >= 0.5 and stop > entry:
             new_stop = entry
-        elif r >= 2.0:
-            new_stop = current + 1.5 * atr
+
+        # Trail at R >= 1.5
+        elif r >= 1.5:
+            new_stop = current + 1.0 * atr
+
         else:
             new_stop = stop
 
@@ -366,11 +376,11 @@ def main_loop():
                 time.sleep(180)
 
             if dt_time(21, 12) <= now < dt_time(21, 14):
-                logger.info("Saving IG trades to DB.")
-                db = sqlite3.connect("streamed_prices.db")
-                c = db.cursor()
-                trdes.save_ig_trades_to_db(db, c, days=3)
-                db.close()
+                #logger.info("Saving IG trades to DB.")
+                #db = sqlite3.connect("streamed_prices.db")
+                #c = db.cursor()
+                #trdes.save_ig_trades_to_db(db, c, days=3)
+                #db.close()
                 time.sleep(60)
 
         except Exception as e:

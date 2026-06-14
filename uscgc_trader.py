@@ -240,19 +240,6 @@ def main_loop():
 
             now = datetime.now().time()
 
-            # Run app.main() once around 21:01–21:03
-            if dt_time(21, 1) <= now < dt_time(21, 3):
-                app.main()
-                time.sleep(180)
-
-            # Save IG trades to DB once around 21:12–21:14
-            if dt_time(21, 12) <= now < dt_time(21, 14):
-                db = sqlite3.connect('streamed_prices.db')
-                c = db.cursor()
-                trdes.save_ig_trades_to_db(db, c, days=3)
-                db.close()
-                time.sleep(60)
-
         except Exception as e:
             # Minimal logging; you can swap this for proper logging
             print(f"[{EPIC} SERVICE] Error: {e}")
