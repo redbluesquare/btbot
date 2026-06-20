@@ -36,13 +36,13 @@ COOLDOWN_MINUTES = 30  # min time between trades on this epic
 
 # ATR / stop logic
 ATR_MIN_TRADE = 8.0          # ATR filter: skip trades if ATR < 8
-ATR_STOP_MULTIPLIER = 3.5    # wider ATR stops
-MIN_STOP_DISTANCE = 10.0     # minimum stop distance in points
+ATR_STOP_MULTIPLIER = 2.0    # wider ATR stops
+MIN_STOP_DISTANCE = 12.0     # minimum stop distance in points
 
 # Time-of-day filter (UTC hours)
 ACTIVE_WINDOWS = [
     (8, 10),   # 08:00–10:00
-    (14, 16),  # 14:00–16:00
+    (14, 17),  # 14:00–16:00
 ]
 
 API_KEY = os.getenv("API_KEY")
@@ -108,7 +108,7 @@ def is_big_candle(row) -> bool:
     atr = row["atr"]
     if atr <= 0:
         return False
-    return candle_range > 2.0 * atr
+    return candle_range > 3.0 * atr
 
 
 def get_position_age_bars(open_pos, last_bar_time, timeframe_minutes=5) -> int:
@@ -158,7 +158,7 @@ def process_epic(ig_service, positions):
     df = df.sort_values(by="date", ascending=True)
 
     # Slower MACD: 12,26,9
-    df = ind.calculate_macd(df, 12, 26, 9)
+    df = ind.calculate_macd(df, 8, 21, 5)
     # MACD slope
     df["macd_slope"] = df["macd"].diff()
 
@@ -198,14 +198,14 @@ def process_epic(ig_service, positions):
         last["bullish_crossover"]
         and macd_slope_up
         and price_above_ema
-        and last["rsi"] < 45
+        and last["rsi"] > 55
     )
 
     sell_signal = (
         last["bearish_crossover"]
         and macd_slope_down
         and price_below_ema
-        and last["rsi"] > 55
+        and last["rsi"] < 45
     )
 
     # --- No open position: look for entries ---
