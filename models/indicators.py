@@ -47,6 +47,18 @@ class Indicators():
         df['atr'] = tr.rolling(period).mean()
         return df
 
+    def add_bollinger_bands(self, df, window=20, num_std=2):
+        """
+        Calculate Bollinger Bands and add them to the DataFrame.
+        Adds columns: 'bb_middle', 'bb_upper', 'bb_lower'
+        """
+        rolling_mean = df['close'].rolling(window=window).mean()
+        rolling_std = df['close'].rolling(window=window).std()
+        df['bb_middle'] = rolling_mean
+        df['bb_upper'] = rolling_mean + (rolling_std * num_std)
+        df['bb_lower'] = rolling_mean - (rolling_std * num_std)
+        return df
+
     def calculate_rsi(self, df, period=21):
         close = df['close']
         delta = close.diff()
