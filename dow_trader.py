@@ -51,7 +51,7 @@ SELL_SIZE = "0.01"
 COOLDOWN_MINUTES = 30
 
 # Stop / volatility config
-ATR_MIN_TRADE = 40.0          # skip low-volatility DOW
+ATR_MIN_TRADE = 25.0          # skip low-volatility DOW
 STOP_ATR_MULTIPLIER = 2.5     # stop = ATR * multiplier
 MIN_STOP_DISTANCE = 80.0      # minimum stop distance in points
 
@@ -89,7 +89,7 @@ def in_us_session(ts) -> bool:
     """
     hour = ts.hour
     minute = ts.minute
-    return ((hour == 13 and minute >= 30) or (14 <= hour < 16))
+    return ((hour == 13 and minute >= 30) or (14 <= hour < 17))
 
 
 def bars_since_entry(open_pos, last_timestamp, timeframe_minutes=5) -> int:
@@ -160,7 +160,7 @@ def trade_epic():
 
     # Big candle / momentum filter
     candle_range = last["high"] - last["low"]
-    if candle_range <= 1.2 * last["atr"]:
+    if candle_range <= 0.8 * last["atr"]:
         logger.debug("DOW candle not strong enough, skipping.")
         return
 
@@ -169,14 +169,14 @@ def trade_epic():
         last["bullish_crossover"]
         and last["macd_slope"] > 0
         and last["close"] > last["ema20"]
-        and last["rsi"] > 60
+        and last["rsi"] > 55
     )
 
     sell_signal = (
         last["bearish_crossover"]
         and last["macd_slope"] < 0
         and last["close"] < last["ema20"]
-        and last["rsi"] < 40
+        and last["rsi"] < 45
     )
 
     # ---------------------------------------------------------
