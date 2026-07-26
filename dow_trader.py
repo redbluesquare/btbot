@@ -85,7 +85,7 @@ def last_trade_time(epic: str):
 def in_us_session(ts) -> bool:
     """
     DOW trades only in US session:
-    13:30–16:00 UTC (approx UK time in your setup).
+    13:30–17:00 UTC (approx UK time in your setup).a
     """
     hour = ts.hour
     minute = ts.minute
@@ -284,7 +284,7 @@ def trade_epic():
         r = (current - entry) / risk
 
         if r >= 1.0 and stop < entry:
-            new_stop = max(new_stop, entry * 1.0001)
+            new_stop = max(new_stop, current - 1.5 * atr)
         elif r >= 2.0:
             new_stop = max(new_stop, current - 1.5 * atr)
 
@@ -302,7 +302,7 @@ def trade_epic():
         r = (entry - current) / risk
 
         if r >= 1.0 and stop > entry:
-            new_stop = min(new_stop, entry)
+            new_stop = min(new_stop, current + 1.5 * atr)
         elif r >= 2.0:
             new_stop = min(new_stop, current + 1.5 * atr)
 
