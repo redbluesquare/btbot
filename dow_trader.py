@@ -89,7 +89,7 @@ def in_us_session(ts) -> bool:
     """
     hour = ts.hour
     minute = ts.minute
-    return ((hour == 13 and minute >= 30) or (14 <= hour < 17))
+    return ((hour == 8 and minute >= 30) or (9 <= hour < 18))
 
 
 def bars_since_entry(open_pos, last_timestamp, timeframe_minutes=5) -> int:
