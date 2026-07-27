@@ -284,7 +284,7 @@ def trade_epic():
         r = (current - entry) / risk
 
         if r >= 1.0 and stop < entry:
-            new_stop = max(new_stop, current - 1.5 * atr)
+            new_stop = te.fixed_trailing_stop(stop, current_price=current, direction=open_pos["direction"], trail_distance=32)
         elif r >= 2.0:
             new_stop = max(new_stop, current - 1.5 * atr)
 
@@ -302,7 +302,7 @@ def trade_epic():
         r = (entry - current) / risk
 
         if r >= 1.0 and stop > entry:
-            new_stop = min(new_stop, current + 1.5 * atr)
+            new_stop = te.fixed_trailing_stop(stop, current_price=current, direction=open_pos["direction"], trail_distance=32)
         elif r >= 2.0:
             new_stop = min(new_stop, current + 1.5 * atr)
 

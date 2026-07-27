@@ -23,3 +23,28 @@ class TradeExecutor():
             trailing_stop=False,
             trailing_stop_increment=None)
         return response
+
+    def fixed_trailing_stop(self, current_stop, current_price, direction, trail_distance):
+        """
+        Fixed trailing stop that NEVER moves the stop backwards.
+        
+        BUY  → stop trails below price, but never decreases
+        SELL → stop trails above price, but never increases
+        """
+        if direction == "BUY":
+            # Proposed new stop
+            proposed = current_price - trail_distance
+            # Only move stop UP (never down)
+            if proposed > current_stop:
+                return proposed
+            else:
+                return current_stop
+        elif direction == "SELL":
+            proposed = current_price + trail_distance
+            # Only move stop DOWN (never up)
+            if proposed < current_stop:
+                return proposed
+            else:
+                return current_stop
+        else:
+            raise ValueError("Direction must be 'BUY' or 'SELL'")
