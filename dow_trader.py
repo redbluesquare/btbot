@@ -300,7 +300,6 @@ def trade_epic():
     # SELL POSITION MANAGEMENT
     elif open_pos["direction"] == "SELL":
         r = (entry - current) / risk
-
         if r >= 1.0:
             new_stop = te.fixed_trailing_stop(stop, current_price=current, direction=open_pos["direction"], trail_distance=32)
         elif r >= 2.0:
