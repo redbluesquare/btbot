@@ -1,7 +1,7 @@
 import sqlite3
 
 def create_trades_table():
-    db = sqlite3.connect('btbot.db')
+    db = sqlite3.connect('streamed_prices.db')
     c = db.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS trade_data (
@@ -38,7 +38,7 @@ def create_trades_table():
     db.close()
 
 def update_trades_table():
-    db = sqlite3.connect('btbot.db')
+    db = sqlite3.connect('streamed_prices.db')
     c = db.cursor()
     columns_to_add = [ 
         ("open_level", "REAL")
@@ -56,7 +56,7 @@ def update_trades_table():
     db.close()
 
 def create_trading_check_table():
-    db = sqlite3.connect('btbot.db')
+    db = sqlite3.connect('streamed_prices.db')
     c = db.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS trading_position (
